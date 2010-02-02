@@ -1,0 +1,20 @@
+#!/usr/bin/env jruby
+#-*- ruby -*-
+#. hashdot.profile         += daemon
+#. hashdot.pid_file         = ./iyyov.pid
+#. hashdot.io_redirect.file = ./iyyov.log
+#. hashdot.vm.options      += -Xmx128m
+#. hashdot.user.set         = deploy
+
+require 'rubygems'
+
+gem( "iyyov", "= 1.0.0" )
+
+require 'rjack-logback'
+require 'iyyov'
+
+RJack::Logback.config_console( :full => true )
+
+Hashdot::Daemon::Runner.new.run
+
+# Low memory usaage
