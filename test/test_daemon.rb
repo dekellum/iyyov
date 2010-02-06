@@ -53,10 +53,10 @@ class TestDaemon < Test::Unit::TestCase
     FileUtils.rm_rf( "#{tdir}/myname-33" )
   end
 
-  def test_init_path
+  def test_exe_path
     d = Daemon.new { |h| h.name = "hashdot-daemon" }
-    assert File.executable?( d.init_path )
-    @log.info d.init_path
+    assert File.executable?( d.exe_path )
+    @log.info d.exe_path
   end
 
 end

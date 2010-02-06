@@ -11,6 +11,7 @@ module Iyyov
     attr_accessor :name
 
     attr_writer   :instance
+    attr_writer   :exe_path
     attr_writer   :base_dir
     attr_writer   :run_dir
     attr_accessor :make_run_dir
@@ -22,7 +23,8 @@ module Iyyov
     attr_writer   :version
     attr_writer   :init_name
 
-    LVARS = [ :@instance, :@base_dir, :@run_dir, :@pid_file, :@logs,
+    # Instance variables which may be set as Procs
+    LVARS = [ :@instance, :@exe_path, :@base_dir, :@run_dir, :@pid_file, :@logs,
               :@gem_name, :@version, :@init_name ]
 
     def initialize( context = Iyyov.context )
@@ -31,6 +33,7 @@ module Iyyov
       @name         = nil
 
       @instance     = nil
+      @exe_path     = method :gem_exe_path
       @base_dir     = method :default_base_dir
       @run_dir      = method :default_run_dir
       @make_run_dir = @context.make_run_dir
@@ -94,10 +97,9 @@ module Iyyov
       File.join( run_dir, file_name )
     end
 
-    def init_path
+    def gem_exe_path
       spec = Gem.source_index.find_name( name, version ).last or
-        raise( Gem::GemNotFoundException,
-               "can't find gem #{name} (#{version})" )
+        raise(Gem::GemNotFoundException, "Missing gem #{name} (#{version})")
       File.join( spec.full_gem_path, 'init', init_name )
     end
 
@@ -105,7 +107,7 @@ module Iyyov
       @log.info( "starting" )
 
       Dir.chdir( run_dir ) do
-        system( init_path ) or raise( "Start failed with " + $? )
+        system( exe_path ) or raise( "Start failed with " + $? )
       end
       # FIXME: Wait for pid. If doesn't happen log error?
     end
