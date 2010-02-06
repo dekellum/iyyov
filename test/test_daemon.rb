@@ -16,7 +16,7 @@
 # permissions and limitations under the License.
 #++
 
-$LOAD_PATH.unshift File.join( File.dirname(__FILE__), "..", "lib" )
+$LOAD_PATH.unshift File.join( File.dirname( __FILE__ ), "..", "lib" )
 
 require 'rubygems'
 require 'rjack-logback'
@@ -24,6 +24,7 @@ require 'rjack-logback'
 RJack::Logback.config_console( :level => Logback::INFO )
 
 require 'iyyov'
+require 'fileutils'
 
 require 'test/unit'
 
@@ -32,21 +33,28 @@ class TestDaemon < Test::Unit::TestCase
 
   def setup
     @log = RJack::SLF4J[ self.class ]
+    @context = Context
   end
 
   def test_init
-    d = Daemon.new( "myname" ) do |h|
-      h.base_dir = '/base/dir'
+    tdir = File.dirname( __FILE__ )
+
+    d = Daemon.new() do |h|
+      h.name     = "myname"
+      h.base_dir = tdir
       h.instance = '33'
     end
 
-    assert_equal( "/base/dir/myname-33", d.un( d.run_dir ) )
-    assert_equal( "/base/dir/myname-33/myname.pid", d.pid_file )
-    assert_equal( [ "/base/dir/myname-33/myname.log" ], d.logs )
+    assert_equal( "myname",                           d.gem_name )
+    assert_equal( "#{tdir}/myname-33",                d.run_dir )
+    assert_equal( "#{tdir}/myname-33/myname.pid",     d.pid_file )
+    assert_equal( [ "#{tdir}/myname-33/myname.log" ], d.logs )
+
+    FileUtils.rm_rf( "#{tdir}/myname-33" )
   end
 
   def test_init_path
-    d = Daemon.new( "hashdot-daemon" )
+    d = Daemon.new { |h| h.name = "hashdot-daemon" }
     assert File.executable?( d.init_path )
     @log.info d.init_path
   end

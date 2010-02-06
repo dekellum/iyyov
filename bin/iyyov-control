@@ -1,0 +1,19 @@
+#!/usr/bin/env jruby
+# -*- ruby -*-
+
+$LOAD_PATH.unshift File.join( File.dirname(__FILE__), "..", "lib" )
+
+require 'rubygems'
+require 'rjack-logback'
+
+Logback.config_console( :level => Logback::INFO )
+
+require 'iyyov'
+
+Iyyov.context do |c|
+
+  ARGV.each do |afile|
+    c.load_file( afile )
+  end
+  c.event_loop
+end
