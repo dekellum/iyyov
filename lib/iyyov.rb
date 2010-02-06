@@ -13,22 +13,28 @@ module Iyyov
     attr_accessor :base_dir
     attr_accessor :make_run_dir
 
+    # Private?
+    attr_reader   :scheduler
+
     def initialize
       @base_dir  = "/opt/var"
       @make_run_dir = true
 
+      #FIXME: Support other gem home than ours?
+
+      yield self if block_given?
+
       @scheduler = Scheduler.new
 
-      #FIXME: Support alt gem home then ours?
       @daemons = []
-
       @log = SLF4J[ self.class ]
     end
 
     def define_daemon( &block )
       d = Daemon.new( self, &block )
-      @scheduler.add( WatchTask.new( d ) )
       @daemons << d
+      d.tasks.each { |t| @scheduler.add( t ) }
+      d.do_first
       nil
     end
 
@@ -38,28 +44,7 @@ module Iyyov
     end
 
     def event_loop
-      @scheduler.run
-    end
-  end
-
-  class WatchTask < Scheduler::Task
-    def initialize( daemon )
-      super( 5.0 )
-      @daemon = daemon
-      @log = SLF4J[ self.class ]
-    end
-    def call
-      pid = @daemon.pid
-      alive = pid && check_pid( pid )
-      if alive
-        @log.info { "#{@daemon.name} is alive" }
-      else
-        @log.info { "#{@daemon.name} starting" }
-        @daemon.start
-      end
-    end
-    def check_pid( pid )
-      File.directory?( '/proc/' + pid.to_s )
+      @scheduler.event_loop
     end
   end
 

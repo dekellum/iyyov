@@ -6,7 +6,7 @@ $LOAD_PATH.unshift File.join( File.dirname(__FILE__), "..", "lib" )
 require 'rubygems'
 require 'rjack-logback'
 
-Logback.config_console( :level => Logback::INFO )
+Logback.config_console( :level => Logback::DEBUG )
 
 require 'iyyov'
 

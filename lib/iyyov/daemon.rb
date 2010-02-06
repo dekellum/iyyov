@@ -52,6 +52,14 @@ module Iyyov
       nil
     end
 
+    def tasks
+      [ Scheduler::Task.new( 5.0 ) { start_check } ]
+    end
+
+    def do_first
+      start_check
+    end
+
     def validate
 
       unless File.directory?( run_dir )
@@ -62,6 +70,7 @@ module Iyyov
           raise "run_dir [#{run_dir}] not found"
         end
       end
+
     end
 
     def default_base_dir
@@ -93,10 +102,26 @@ module Iyyov
     end
 
     def start
+      @log.info( "starting" )
+
       Dir.chdir( run_dir ) do
         system( init_path ) or raise( "Start failed with " + $? )
       end
       # FIXME: Wait for pid. If doesn't happen log error?
+    end
+
+    def start_check
+      p = pid
+      alive = p && check_pid( p )
+      if alive
+        @log.debug { "checked: alive (pid:#{p})" }
+      else
+        start
+      end
+    end
+
+    def check_pid( p = pid )
+      File.directory?( '/proc/' + p.to_s )
     end
 
     def stop

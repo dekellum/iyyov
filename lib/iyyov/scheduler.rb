@@ -1,9 +1,7 @@
-
 require 'java'
 
-require 'rjack-slf4j'
-
 module Iyyov
+
   class Scheduler
 
     class Task
@@ -61,7 +59,7 @@ module Iyyov
       @queue.poll
     end
 
-    def run
+    def event_loop
       delta = nil
       loop do
         now = Time.now
