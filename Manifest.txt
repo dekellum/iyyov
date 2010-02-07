@@ -2,6 +2,12 @@ Manifest.txt
 History.rdoc
 README.rdoc
 Rakefile
+bin/iyyov-fg
+init/iyyov-daemon
 lib/iyyov/base.rb
 lib/iyyov.rb
+lib/iyyov/daemon.rb
+lib/iyyov/log_rotator.rb
+lib/iyyov/scheduler.rb
+lib/iyyov/shutdown_handler.rb
 test/test_daemon.rb

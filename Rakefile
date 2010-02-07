@@ -21,7 +21,7 @@ require 'rubygems'
 gem     'rjack-tarpit', '~> 1.1.0'
 require 'rjack-tarpit'
 
-require 'iyyov'
+require 'iyyov/base'
 
 t = RJack::TarPit.new( 'iyyov', Iyyov::VERSION )
 
