@@ -2,6 +2,8 @@
 require 'rjack-slf4j'
 require 'fileutils'
 
+require 'iyyov/log_rotator'
+
 module Iyyov
   include RJack
 
@@ -15,6 +17,8 @@ module Iyyov
     attr_writer   :base_dir
     attr_writer   :run_dir
     attr_accessor :make_run_dir
+    attr_accessor :stop_on_exit
+    attr_accessor :stop_delay
 
     attr_writer   :pid_file
     attr_writer   :logs
@@ -37,6 +41,8 @@ module Iyyov
       @base_dir     = method :default_base_dir
       @run_dir      = method :default_run_dir
       @make_run_dir = @context.make_run_dir
+      @stop_on_exit = @context.stop_on_exit
+      @stop_delay   = @context.stop_delay
 
       @pid_file     = method :default_pid_file
       @logs         = method :default_logs
@@ -45,22 +51,44 @@ module Iyyov
       @version      = '>= 0'
       @init_name    = method :name
 
+      @rotate       = nil
+
       yield self
 
       raise "name not specified" unless name
 
-      @log = SLF4J[ [ SLF4J[ self.class ].name, name ].join( '.' ) ]
+      @log = SLF4J[ [ SLF4J[ self.class ].name,
+                      name, instance ].compact.join( '.' ) ]
 
       validate
       nil
     end
 
+    def log_rotate
+      @rotate = LogRotator.new
+      yield @rotate if block_given?
+    end
+
     def tasks
-      [ Scheduler::Task.new( 5.0 ) { start_check } ]
+      t = [ Scheduler::Task.new( 5.0 ) { start_check } ]
+      if @rotate
+        logs.each do |log|
+          t << Scheduler::Task.new( @rotate.check_period ) do
+            @rotate.check_rotate( log, pid ) do
+              @log.info { "Rotating log #{log}" }
+            end
+          end
+        end
+      end
+      t
     end
 
     def do_first
       start_check
+    end
+
+    def do_exit
+      stop if stop_on_exit
     end
 
     def validate
@@ -98,13 +126,15 @@ module Iyyov
     end
 
     def gem_exe_path
+      #FIXME: Gem.clear_paths to rescan.
+      #or: Gem::SourceIndex.from_installed_gems.find_name(...)
       spec = Gem.source_index.find_name( name, version ).last or
         raise(Gem::GemNotFoundException, "Missing gem #{name} (#{version})")
       File.join( spec.full_gem_path, 'init', init_name )
     end
 
     def start
-      @log.info( "starting" )
+      @log.info "starting"
 
       Dir.chdir( run_dir ) do
         system( exe_path ) or raise( "Start failed with " + $? )
@@ -114,31 +144,48 @@ module Iyyov
 
     def start_check
       p = pid
-      alive = p && check_pid( p )
-      if alive
+      if alive?( p )
         @log.debug { "checked: alive (pid:#{p})" }
       else
         start
       end
     end
 
-    def check_pid( p = pid )
-      File.directory?( '/proc/' + p.to_s )
+    def alive?( p = pid )
+      ( Process.getpgid( p ) != -1 ) if p
+    rescue Errno::ESRCH
+      false
     end
 
     def stop
-      id = pid
-      if id
-        Process.kill( "TERM", id )
-        # FIXME: Wait for pid?
+      p = pid
+      if p
+        @log.info "Sending TERM signal"
+        Process.kill( "TERM", p )
+        unless wait_pid( p )
+          @log.info "Sending KILL signal"
+          Process.kill( "KILL", p )
+        end
         true
-      else
-        false
       end
+      false
     rescue Errno::ESRCH
       # No such process: only raised by MRI ruby currently
       # FIXME: EPERM: not permitted? Also MRI ruby only.
       false
+    end
+
+    def wait_pid( p = pid )
+      delta = 1.0 / 16
+      delay = 0.0
+      check = false
+      while delay < stop_delay do
+        break if ( check = ! alive?( p ) )
+        sleep delta
+        delay += delta
+        delta += ( 1.0 / 16 ) if delta < 0.50
+      end
+      check
     end
 
     # Return process ID from pid_file if exists or nil otherwise

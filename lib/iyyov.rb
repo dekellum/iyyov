@@ -12,6 +12,8 @@ module Iyyov
   class Context
     attr_accessor :base_dir
     attr_accessor :make_run_dir
+    attr_accessor :stop_on_exit
+    attr_accessor :stop_delay
 
     # Private?
     attr_reader   :scheduler
@@ -19,15 +21,19 @@ module Iyyov
     def initialize
       @base_dir  = "/opt/var"
       @make_run_dir = true
+      @stop_on_exit = false
+      @stop_delay = 30.0
 
       #FIXME: Support other gem home than ours?
-
-      yield self if block_given?
-
-      @scheduler = Scheduler.new
-
       @daemons = []
       @log = SLF4J[ self.class ]
+      @scheduler = Scheduler.new
+      @scheduler.on_exit do
+        @log.info "Shutting down"
+        @daemons.each { |d| d.do_exit }
+      end
+
+      yield self if block_given?
     end
 
     def define_daemon( &block )
@@ -45,7 +51,9 @@ module Iyyov
 
     def event_loop
       @scheduler.event_loop
+      @log.info "Event loop exited"
     end
+
   end
 
   @context = Context.new

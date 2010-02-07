@@ -1,5 +1,8 @@
 require 'java'
 
+require 'thread'
+require 'iyyov/shutdown_handler'
+
 module Iyyov
 
   class Scheduler
@@ -43,6 +46,7 @@ module Iyyov
     def initialize
       # min heap
       @queue = Java::java.util.PriorityQueue.new( 67, TimeComp.new )
+      @lock = Mutex.new
     end
 
     def add( t, now = Time.now )
@@ -53,32 +57,42 @@ module Iyyov
       @queue.peek
     end
 
-    def
-
     def poll
       @queue.poll
+    end
+
+    def on_exit( &block )
+      ShutdownHandler.on_exit do
+        @lock.synchronize do
+          @queue.clear
+          block.call
+        end
+      end
     end
 
     def event_loop
       delta = nil
       loop do
         now = Time.now
-        loop do
-          if ( top = peek )
-            delta = top.next_time - now
-            if delta <= 0.0
-              t = @queue.poll
-              t.call
-              add( t, now )
-              next
+        @lock.synchronize do
+          loop do
+            if ( top = peek )
+              delta = top.next_time - now
+              if delta <= 0.0
+                t = @queue.poll
+                t.call
+                add( t, now )
+                next
+              end
+            else
+              delta = nil
             end
+            break
           end
-          break
         end
-        break if delta < 0.0
+        break unless delta && delta > 0.0
         sleep delta
       end
-      false
     end
 
   end
