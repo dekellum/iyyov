@@ -3,16 +3,22 @@
 #. hashdot.profile         += daemon
 #. hashdot.pid_file         = ./iyyov.pid
 #. hashdot.io_redirect.file = ./iyyov.log
-#. hashdot.vm.options      += -Xmx128m
-#. hashdot.user.set         = deploy
+#. hashdot.vm.options      += -Xmx64m
+##FIXME: . hashdot.user.set         = deploy
 
 require 'rubygems'
 
 gem( "iyyov", "= 1.0.0" )
 
 require 'rjack-logback'
+
+RJack::Logback.config_console( :full => true, :level => Logback::DEBUG ) #FIXME
+
 require 'iyyov'
 
-RJack::Logback.config_console( :full => true )
-
-Hashdot::Daemon::Runner.new.run
+Iyyov.context do |c|
+  ARGV.each do |afile|
+    c.load_file( afile )
+  end
+  c.event_loop
+end
