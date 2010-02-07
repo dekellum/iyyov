@@ -48,7 +48,6 @@ class TestDaemon < Test::Unit::TestCase
     assert_equal( "myname",                           d.gem_name )
     assert_equal( "#{tdir}/myname-33",                d.run_dir )
     assert_equal( "#{tdir}/myname-33/myname.pid",     d.pid_file )
-    assert_equal( [ "#{tdir}/myname-33/myname.log" ], d.logs )
 
     FileUtils.rm_rf( "#{tdir}/myname-33" )
   end

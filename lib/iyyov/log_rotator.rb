@@ -4,6 +4,8 @@ module Iyyov
   include RJack
 
   class LogRotator
+
+    attr_accessor :log
     attr_accessor :max_size
     attr_accessor :count
     attr_accessor :gzip
@@ -21,11 +23,12 @@ module Iyyov
       @gzip = true
       @signal = "HUP"
       @check_period = 5 * 60.0
+      @log = nil
     end
 
     # Check if log is over size and rotate if needed. Yield log name
     # to block just before rotating
-    def check_rotate( log, pid )
+    def check_rotate( pid )
       if File.exist?( log ) && File.size( log ) > max_size
         yield log if block_given?
         opts  = { :count => count, :gzip => gzip }

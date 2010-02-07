@@ -21,14 +21,13 @@ module Iyyov
     attr_accessor :stop_delay
 
     attr_writer   :pid_file
-    attr_writer   :logs
 
     attr_writer   :gem_name
     attr_writer   :version
     attr_writer   :init_name
 
     # Instance variables which may be set as Procs
-    LVARS = [ :@instance, :@exe_path, :@base_dir, :@run_dir, :@pid_file, :@logs,
+    LVARS = [ :@instance, :@exe_path, :@base_dir, :@run_dir, :@pid_file,
               :@gem_name, :@version, :@init_name ]
 
     def initialize( context = Iyyov.context )
@@ -45,13 +44,11 @@ module Iyyov
       @stop_delay   = @context.stop_delay
 
       @pid_file     = method :default_pid_file
-      @logs         = method :default_logs
-
       @gem_name     = method :name
       @version      = '>= 0'
       @init_name    = method :name
 
-      @rotate       = nil
+      @rotators     = {}
 
       yield self
 
@@ -65,18 +62,19 @@ module Iyyov
     end
 
     def log_rotate
-      @rotate = LogRotator.new
-      yield @rotate if block_given?
+      lr = LogRotator.new
+      lr.log = default_log
+      yield lr if block_given?
+      @rotators[ lr.log ] = lr
+      nil
     end
 
     def tasks
       t = [ Scheduler::Task.new( 5.0 ) { start_check } ]
-      if @rotate
-        logs.each do |log|
-          t << Scheduler::Task.new( @rotate.check_period ) do
-            @rotate.check_rotate( log, pid ) do
-              @log.info { "Rotating log #{log}" }
-            end
+      t += @rotators.values.map do |lr|
+        Scheduler::Task.new( lr.check_period ) do
+          lr.check_rotate( pid ) do |rlog|
+            @log.info { "Rotating log #{rlog}" }
           end
         end
       end
@@ -116,8 +114,8 @@ module Iyyov
       in_dir( name + '.pid' )
     end
 
-    def default_logs
-      [ in_dir( name + '.log' ) ]
+    def default_log
+      in_dir( name + '.log' )
     end
 
     # Return full path to file_name within run_dir
