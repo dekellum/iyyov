@@ -16,5 +16,3 @@ require 'iyyov'
 RJack::Logback.config_console( :full => true )
 
 Hashdot::Daemon::Runner.new.run
-
-# Low memory usaage
