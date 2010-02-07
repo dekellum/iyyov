@@ -61,10 +61,11 @@ module Iyyov
       nil
     end
 
-    def log_rotate
-      lr = LogRotator.new
-      lr.log = default_log
-      yield lr if block_given?
+    # Create a new LogRotator and yields it to block for
+    # configuration.
+    # The default log path is name + ".log" in run_dir
+    def log_rotate( &block )
+      lr = LogRotator.new( default_log, &block )
       @rotators[ lr.log ] = lr
       nil
     end
