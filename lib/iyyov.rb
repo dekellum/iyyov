@@ -7,7 +7,6 @@ require 'rjack-slf4j'
 require 'fileutils'
 
 module Iyyov
-  include RJack
 
   class Context
     attr_accessor :base_dir
@@ -27,7 +26,7 @@ module Iyyov
       #FIXME: Support other gem home than ours?
       @rotators  = {}
       @daemons   = []
-      @log = SLF4J[ self.class ]
+      @log = RJack::SLF4J[ self.class ]
       @scheduler = Scheduler.new
       @scheduler.on_exit do
         @log.info "Shutting down"
