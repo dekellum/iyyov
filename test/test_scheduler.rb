@@ -1,0 +1,50 @@
+#!/usr/bin/env jruby
+#.hashdot.profile += jruby-shortlived
+#--
+# Copyright (C) 2010 David Kellum
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you
+# may not use this file except in compliance with the License.  You
+# may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.  See the License for the specific language governing
+# permissions and limitations under the License.
+#++
+
+$LOAD_PATH.unshift File.join( File.dirname( __FILE__ ), "..", "lib" )
+
+require 'iyyov/scheduler'
+require 'test/unit'
+
+class TestScheduler < Test::Unit::TestCase
+  include Iyyov
+
+  def test_fixed_times
+    tk = Scheduler::Task.new
+    tk.fixed_times = %w[ 6:00 8:00 10:00 12:00 ]
+
+    assert_next_time_from( tk, '2010-02-08T08:00', '2010-02-08T10:00' )
+
+    assert_next_time_from( tk, '2010-02-08T12:00', '2010-02-09T06:00' )
+
+    tk.fixed_days = 3..6
+    assert_next_time_from( tk, '2010-02-08T08:00', '2010-02-10T06:00' )
+  end
+
+  def assert_next_time_from( tk, now, expected )
+    2.times do
+      assert_equal( tp( expected ), tk.next_fixed_time( tp( now ) ) )
+      tk.fixed_times = tk.fixed_times.reverse
+    end
+  end
+
+  def tp( t )
+    Time.parse( t )
+  end
+
+end
