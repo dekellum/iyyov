@@ -70,7 +70,7 @@ module Iyyov
 
     def register_tasks
       @rotators.values.each do |lr|
-        t = Scheduler::Task.new( lr.check_period ) do
+        t = Scheduler::Task.new( :period => lr.check_period ) do
           lr.check_rotate do |rlog|
             @log.info { "Rotating log #{rlog}" }
           end

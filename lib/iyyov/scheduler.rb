@@ -26,17 +26,26 @@ module Iyyov
       attr_accessor :fixed_times
 
       # Array or range for days of week in which fixed_times
-      # apply. Days are 0 (Sunday) .. 6 (Saturday) Example: M-F == 1..5
-      # ~include?( day_of_week ) (default: 0..6)
+      # apply. Days are 0 (Sunday) .. 6 (Saturday). Example: M-F == (1..5)
+      # ~include?( day_of_week ) (default: (0..6))
       attr_accessor :fixed_days
 
-      # New task given optional period interval in seconds and block
-      # containing work.
-      def initialize( period = nil, &block )
-        @next_time = nil
-        @period = period
+      # Name the task for log reporting.
+      attr_accessor :name
+
+      # New task given options matching accessors and block containing
+      # work.
+      def initialize( opts = {}, &block )
+        @name        = nil
+        @next_time   = nil
+        @period      = nil
         @fixed_times = nil
-        @fixed_days = (0..6)
+        @fixed_days  = (0..6) #all
+
+        opts.each { |k,v| send( k.to_s + '=', v ) }
+
+        #FIXME: Validation.
+
         @block = block
       end
 
@@ -59,7 +68,7 @@ module Iyyov
       end
 
       def next_fixed_time( now )
-        day = Date.today
+        day = Date.civil( now.year, now.month, now.day )
         last = day + 7
         ntime = nil
         while ntime.nil? && day <= last

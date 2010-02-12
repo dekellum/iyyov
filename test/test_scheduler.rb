@@ -25,8 +25,7 @@ class TestScheduler < Test::Unit::TestCase
   include Iyyov
 
   def test_fixed_times
-    tk = Scheduler::Task.new
-    tk.fixed_times = %w[ 6:00 8:00 10:00 12:00 ]
+    tk = Scheduler::Task.new( :fixed_times => %w[ 6:00 8:00 10:00 12:00 ] )
 
     assert_next_time_from( tk, '2010-02-08T08:00', '2010-02-08T10:00' )
 
