@@ -25,6 +25,10 @@ module Iyyov
     attr_writer   :gem_name
     attr_writer   :version
     attr_writer   :init_name
+    attr_reader   :state
+
+    # States tracked
+    STATES = [ :begin, :up, :failed, :stopped ]
 
     # Instance variables which may be set as Procs
     LVARS = [ :@instance, :@exe_path, :@base_dir, :@run_dir, :@pid_file,
@@ -48,6 +52,8 @@ module Iyyov
       @version      = '>= 0'
       @init_name    = method :name
 
+      @state        = :begin
+      @gem_spec     = nil
       @rotators     = {}
 
       yield self
@@ -98,6 +104,7 @@ module Iyyov
           FileUtils.mkdir_p( run_dir, :mode => 0755 )
         else
           raise "run_dir [#{run_dir}] not found"
+          #FIXME: Log instead?
         end
       end
 
@@ -125,20 +132,30 @@ module Iyyov
     end
 
     def gem_exe_path
-      #FIXME: Gem.clear_paths to rescan.
-      #or: Gem::SourceIndex.from_installed_gems.find_name(...)
-      spec = Gem.source_index.find_name( name, version ).last or
-        raise(Gem::GemNotFoundException, "Missing gem #{name} (#{version})")
-      File.join( spec.full_gem_path, 'init', init_name )
+      File.join( find_gem_spec.full_gem_path, 'init', init_name )
+    end
+
+    def find_gem_spec
+      #FIXME: Use Gem.clear_paths to rescan.
+      @gem_spec ||= Gem.source_index.find_name( gem_name, version ).last
+      unless @gem_spec
+        raise( Gem::GemNotFoundException, "Missing gem #{gem_name} (#{version})" )
+      end
+      @gem_spec
     end
 
     def start
-      @log.info "starting"
+      epath = exe_path
+      aversion = @gem_spec && @gem_spec.version
+      @log.info "starting #{aversion}"
 
       Dir.chdir( run_dir ) do
         system( exe_path ) or raise( "Start failed with " + $? )
       end
-      # FIXME: Wait for pid. If doesn't happen log error?
+    rescue Gem::GemNotFoundException => e
+      @log.error( e.to_s )
+      @state = :failed
+      # FIXME: Pull tasks out of scheduler?
     end
 
     def start_check
