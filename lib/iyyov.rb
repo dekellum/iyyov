@@ -55,6 +55,14 @@ module Iyyov
       end
     end
 
+    def schedule_at( opts = {}, &block )
+      t = Scheduler::Task.new( opts ) do
+        @log.info { "scheduled at : #{ opts.inspect }" }
+        block.call
+      end
+      @scheduler.add( t )
+    end
+
     def define_daemon( &block )
       d = Daemon.new( self, &block )
       @daemons << d
