@@ -62,9 +62,6 @@ module Iyyov
 
       @log = SLF4J[ [ SLF4J[ self.class ].name,
                       name, instance ].compact.join( '.' ) ]
-
-      validate
-      nil
     end
 
     # Create a new LogRotator and yields it to block for
@@ -76,6 +73,31 @@ module Iyyov
       nil
     end
 
+    # Post initialization validation, attempt immediate start if
+    # needed, and add appropriate tasks to scheduler.
+    def do_first( scheduler )
+      unless File.directory?( run_dir )
+        if make_run_dir
+          @log.info { "Creating run_dir [#{run_dir}]." }
+          FileUtils.mkdir_p( run_dir, :mode => 0755 )
+        else
+          raise( DaemonFailed, "run_dir [#{run_dir}] not found" )
+        end
+      end
+
+      res = start_check
+      unless res == :stop
+        tasks.each { |t| scheduler.add( t ) }
+      end
+      res
+    rescue DaemonFailed, SystemCallError => e
+      #FIXME: Ruby 1.4.0 throws SystemCallError when mkdir fails from
+      #permissions
+      @log.error( e.to_s )
+      @state = :failed
+      :stop
+    end
+
     def tasks
       t = [ Scheduler::Task.new( :period => 5.0 ) { start_check } ]
       t += @rotators.values.map do |lr|
@@ -83,32 +105,13 @@ module Iyyov
           lr.check_rotate( pid ) do |rlog|
             @log.info { "Rotating log #{rlog}" }
           end
-          true
         end
       end
       t
     end
 
-    def do_first
-      start_check
-    end
-
     def do_exit
       stop if stop_on_exit
-    end
-
-    def validate
-
-      unless File.directory?( run_dir )
-        if make_run_dir
-          @log.info { "Creating run_dir [#{run_dir}]." }
-          FileUtils.mkdir_p( run_dir, :mode => 0755 )
-        else
-          raise "run_dir [#{run_dir}] not found"
-          #FIXME: Log instead?
-        end
-      end
-
     end
 
     def default_base_dir
@@ -146,35 +149,48 @@ module Iyyov
     end
 
     def start
-      epath = exe_path
+      epath = File.expand_path( exe_path )
       aversion = @gem_spec && @gem_spec.version
-      @log.info "starting #{aversion}"
+      @log.info { "starting #{aversion}" }
+
+      unless File.executable?( epath )
+        raise( DaemonFailed, "Exe path: #{epath} not found/executable." )
+      end
 
       Dir.chdir( run_dir ) do
-        system( exe_path ) or raise( "Start failed with " + $? )
+        system( epath ) or raise( DaemonFailed, "Start failed with #{$?}" )
       end
-    rescue Gem::GemNotFoundException => e
+
+      @state = :up
+      true
+    rescue Gem::GemNotFoundException, DaemonFailed, Errno::ENOENT => e
       @log.error( e.to_s )
       @state = :failed
-      # FIXME: Pull tasks out of scheduler?
+      false
     end
 
     def start_check
       p = pid
       if alive?( p )
-        @log.debug { "checked: alive (pid:#{p})" }
+        @log.debug { "checked: alive pid: #{p}" }
+        @state = :up
       else
-        start
+        unless start
+          @log.info "start failed, done trying"
+          :stop
+        end
       end
-      true #FIXME: Error handled -> failed, false
     end
 
+    # True if process is up
     def alive?( p = pid )
       ( Process.getpgid( p ) != -1 ) if p
     rescue Errno::ESRCH
       false
     end
 
+    # Stop via SIGTERM, waiting for shutdown for up to stop_delay, then
+    # SIGKILL as last resort. Return true if a process was stopped.
     def stop
       p = pid
       if p
@@ -184,15 +200,20 @@ module Iyyov
           @log.info "Sending KILL signal"
           Process.kill( "KILL", p )
         end
+        @status = :stopped
         true
       end
       false
     rescue Errno::ESRCH
       # No such process: only raised by MRI ruby currently
-      # FIXME: EPERM: not permitted? Also MRI ruby only.
+      false
+    rescue Errno::EPERM => e
+      # Not permitted: only raised by MRI ruby currently
+      @log.error( e )
       false
     end
 
+    # Wait for process to go away
     def wait_pid( p = pid )
       delta = 1.0 / 16
       delay = 0.0
@@ -222,6 +243,8 @@ module Iyyov
     end
 
   end
+
+  class DaemonFailed < StandardError; end
 
   # FIXME: Add configuration/collection watch poll mechanism, which would allow
   # additions,upgrades,etc. to be gracefully handled. Do some use cases.

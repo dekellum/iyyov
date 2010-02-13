@@ -29,7 +29,7 @@ class TestScheduler < MiniTest::Unit::TestCase
     tk = Scheduler::Task.new( :period => 0.001 ) do
       counter += 1
       assert( counter <= 2 )
-      ( counter < 2 )
+      :stop unless counter < 2
     end
     s.add( tk )
     s.event_loop

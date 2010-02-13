@@ -26,29 +26,64 @@ class TestDaemon < MiniTest::Unit::TestCase
 
   def setup
     @log = RJack::SLF4J[ self.class ]
-    @context = Context
+    @tdir = File.dirname( __FILE__ )
+    @context = Context.new do |c|
+      c.base_dir = @tdir
+    end
+  end
+
+  def teardown
+    @context.event_loop #Confirm return
+    @context.shutdown
+    %w[ hashdot-daemon hashdot-noexist ].each do |rdir|
+      FileUtils.rm_rf( File.join( @tdir, rdir ) )
+    end
   end
 
   def test_init
-    tdir = File.dirname( __FILE__ )
-
-    d = Daemon.new() do |h|
+    d = Daemon.new( @context ) do |h|
       h.name     = "myname"
-      h.base_dir = tdir
       h.instance = '33'
     end
 
-    assert_equal( "myname",                           d.gem_name )
-    assert_equal( "#{tdir}/myname-33",                d.run_dir )
-    assert_equal( "#{tdir}/myname-33/myname.pid",     d.pid_file )
-
-    FileUtils.rm_rf( "#{tdir}/myname-33" )
+    assert_equal( "myname",                            d.gem_name )
+    assert_equal( "#{@tdir}/myname-33",                d.run_dir )
+    assert_equal( "#{@tdir}/myname-33/myname.pid",     d.pid_file )
   end
 
   def test_exe_path
-    d = Daemon.new { |h| h.name = "hashdot-daemon" }
+    d = Daemon.new( @context ) { |h| h.name = "hashdot-daemon" }
     assert File.executable?( d.exe_path )
     @log.info d.exe_path
+  end
+
+  def test_invalid_init_name
+    d = Daemon.new( @context ) do |h|
+      h.name = "hashdot-daemon"
+      h.init_name = "no-exist"
+    end
+    assert_equal( :stop, d.do_first( nil ) )
+  end
+
+  def test_invalid_run_dir
+    d = Daemon.new( @context ) do |h|
+      h.name = "hashdot-daemon"
+      h.run_dir = "/no-permission"
+    end
+    assert_equal( :stop, d.do_first( nil ) )
+  end
+
+  def test_invalid_gem_name
+    d = Daemon.new( @context ) { |h| h.name = "hashdot-noexist" }
+    assert_equal( :stop, d.do_first( nil ) )
+ end
+
+  def test_invalid_gem_version
+    d = Daemon.new( @context ) do |h|
+      h.name = "hashdot-daemon"
+      h.version = "= 6.6.6"
+    end
+    assert_equal( :stop, d.do_first( nil ) )
   end
 
 end

@@ -49,7 +49,9 @@ module Iyyov
         @block = block
       end
 
-      # Execute the task
+      # Execute the task, after which the task will be scheduled again
+      # in period time or for the next of fixed_times, unless :stop is
+      # returned.
       def run
         @block.call if @block
       end
@@ -93,6 +95,7 @@ module Iyyov
       # min heap
       @queue = Java::java.util.PriorityQueue.new( 67, TimeComp.new )
       @lock = Mutex.new
+      @shutdown_handler = nil
     end
 
     def add( t, now = Time.now )
@@ -111,7 +114,8 @@ module Iyyov
     # drained such that the on_exit block is guaranteed to be the last
     # to run.
     def on_exit( &block )
-      ShutdownHandler.on_exit do
+      off_exit
+      @shutdown_handler = ShutdownHandler.new do
 
         # Need to lock out the event loop since exit handler is called
         # from a different thread.
@@ -120,6 +124,11 @@ module Iyyov
           block.call
         end
       end
+    end
+
+    def off_exit
+      @shutdown_handler.deregister if @shutdown_handler
+      @shutdown_handler = nil
     end
 
     # Loop forever executing tasks or waiting for the next to be ready
@@ -141,7 +150,9 @@ module Iyyov
               delta = top.next_time - now
               if delta <= 0.0
                 t = @queue.poll
-                add( t, now ) if t.run
+                unless t.run == :stop
+                  add( t, now )
+                end
                 next
               end
             else

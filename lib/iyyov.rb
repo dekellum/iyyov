@@ -24,19 +24,31 @@ module Iyyov
       @stop_delay   = 30.0
 
       #FIXME: Support other gem home than ours?
+
       @rotators  = {}
       @daemons   = []
+      @state     = :begin
       @log = RJack::SLF4J[ self.class ]
       @scheduler = Scheduler.new
-      @scheduler.on_exit do
-        @log.info "Shutting down"
-        @daemons.each { |d| d.do_exit }
-      end
+      @scheduler.on_exit { do_shutdown }
 
       # By default with potential for override
       iyyov_log_rotate
 
       yield self if block_given?
+    end
+
+    def shutdown
+      do_shutdown
+      @scheduler.off_exit
+    end
+
+    def do_shutdown
+      unless @state == :shutdown
+        @log.debug "Shutting down"
+        @daemons.each { |d| d.do_exit }
+        @state = :shutdown
+      end
     end
 
     # Setup log rotation not associated with a daemon
@@ -66,8 +78,7 @@ module Iyyov
     def define_daemon( &block )
       d = Daemon.new( self, &block )
       @daemons << d
-      d.tasks.each { |t| @scheduler.add( t ) }
-      d.do_first
+      d.do_first( @scheduler )
       nil
     end
 
@@ -82,7 +93,6 @@ module Iyyov
           lr.check_rotate do |rlog|
             @log.info { "Rotating log #{rlog}" }
           end
-          true
         end
         @scheduler.add( t )
       end
@@ -91,8 +101,9 @@ module Iyyov
     def event_loop
       register_tasks #FIXME: Better place for this?
 
+      @log.debug "Event loop starting"
       @scheduler.event_loop
-      @log.info "Event loop exited"
+      @log.debug "Event loop exited"
     end
 
   end
