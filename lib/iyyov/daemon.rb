@@ -83,6 +83,7 @@ module Iyyov
           lr.check_rotate( pid ) do |rlog|
             @log.info { "Rotating log #{rlog}" }
           end
+          true
         end
       end
       t
@@ -165,6 +166,7 @@ module Iyyov
       else
         start
       end
+      true #FIXME: Error handled -> failed, false
     end
 
     def alive?( p = pid )

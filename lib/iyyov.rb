@@ -82,6 +82,7 @@ module Iyyov
           lr.check_rotate do |rlog|
             @log.info { "Rotating log #{rlog}" }
           end
+          true
         end
         @scheduler.add( t )
       end

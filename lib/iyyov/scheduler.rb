@@ -50,7 +50,7 @@ module Iyyov
       end
 
       # Execute the task
-      def call
+      def run
         @block.call if @block
       end
 
@@ -141,8 +141,7 @@ module Iyyov
               delta = top.next_time - now
               if delta <= 0.0
                 t = @queue.poll
-                t.call
-                add( t, now )
+                add( t, now ) if t.run
                 next
               end
             else

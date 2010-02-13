@@ -24,6 +24,18 @@ require 'test/unit'
 class TestScheduler < Test::Unit::TestCase
   include Iyyov
 
+  def test_run
+    counter = 0
+    s = Scheduler.new
+    tk = Scheduler::Task.new( :period => 0.001 ) do
+      counter += 1
+      assert( counter <= 2 )
+      ( counter < 2 )
+    end
+    s.add( tk )
+    s.event_loop
+  end
+
   def test_fixed_times
     tk = Scheduler::Task.new( :fixed_times => %w[ 6:00 8:00 10:00 12:00 ] )
 
