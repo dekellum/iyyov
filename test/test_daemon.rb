@@ -16,19 +16,12 @@
 # permissions and limitations under the License.
 #++
 
-$LOAD_PATH.unshift File.join( File.dirname( __FILE__ ), "..", "lib" )
-
-require 'rubygems'
-require 'rjack-logback'
-
-RJack::Logback.config_console( :level => Logback::INFO )
+require File.join( File.dirname( __FILE__ ), "setup" )
 
 require 'iyyov'
 require 'fileutils'
 
-require 'test/unit'
-
-class TestDaemon < Test::Unit::TestCase
+class TestDaemon < MiniTest::Unit::TestCase
   include Iyyov
 
   def setup

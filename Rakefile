@@ -27,6 +27,7 @@ t = RJack::TarPit.new( 'iyyov', Iyyov::VERSION )
 
 t.specify do |h|
   h.developer( 'David Kellum', 'dek-oss@gravitext.com' )
+  h.testlib = :minitest
 end
 
 t.define_tasks

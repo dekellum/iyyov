@@ -16,12 +16,11 @@
 # permissions and limitations under the License.
 #++
 
-$LOAD_PATH.unshift File.join( File.dirname( __FILE__ ), "..", "lib" )
+require File.join( File.dirname( __FILE__ ), "setup" )
 
 require 'iyyov/scheduler'
-require 'test/unit'
 
-class TestScheduler < Test::Unit::TestCase
+class TestScheduler < MiniTest::Unit::TestCase
   include Iyyov
 
   def test_run
