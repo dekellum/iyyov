@@ -1,4 +1,3 @@
-
 #### General test setup: LOAD_PATH, logging, console output ####
 
 ldir = File.join( File.dirname( __FILE__ ), "..", "lib" )
@@ -37,10 +36,3 @@ time_it( "test/unit" ) do
   MiniTest::Unit.output = TestOut.new
 
 end
-
-# FIXME: stdlib Test::Unit equivalent modification
-# Make test output logging compatible: no partial lines.
-# require 'test/unit/ui/console/testrunner'
-# class Test::Unit::UI::Console::TestRunner
-#  alias :output_single :output
-# end
