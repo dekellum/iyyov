@@ -10,4 +10,6 @@ lib/iyyov/daemon.rb
 lib/iyyov/log_rotator.rb
 lib/iyyov/scheduler.rb
 lib/iyyov/shutdown_handler.rb
+test/setup.rb
 test/test_daemon.rb
+test/test_scheduler.rb

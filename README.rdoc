@@ -4,12 +4,13 @@
 
 == Description
 
-Down-to-earth job control and monitoring.
+Down-to-earth job control and monitoring. Features include:
 
-* Pure ruby/shell JRUBY/RUBY compatible.
-* Log-rotation
-* GEM base daemon packing, launch any real daemon that can FIXME
-* Ruby based config, with change detection.
+* Runs on JRuby (no fork)
+* Ruby-based configuration
+* Gem packaged/Hashdot daemon based launching
+* Log rotation with daemon SIGHUP support
+* Fixed time scheduling/basic cron replacement
 
 == License
 

@@ -15,13 +15,9 @@ time_it( "rubygems" ) do
   require 'rubygems'
 end
 
-time_it( "logback?" ) do
-  begin
-    require 'rjack-logback'
-    RJack::Logback.config_console( :level => Logback::INFO, :stderr => true )
-  rescue LoadError
-    require 'slf4j/simple'
-  end
+time_it( "logback" ) do
+  require 'rjack-logback'
+  RJack::Logback.config_console( :level => Logback::INFO, :stderr => true )
 end
 
 time_it( "test/unit" ) do
