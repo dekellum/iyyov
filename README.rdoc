@@ -8,7 +8,7 @@ Down-to-earth job control and monitoring.
 
 * Pure ruby/shell JRUBY/RUBY compatible.
 * Log-rotation
-* GEM base daemon packing, launch any real daemon that can
+* GEM base daemon packing, launch any real daemon that can FIXME
 * Ruby based config, with change detection.
 
 == License
