@@ -119,11 +119,11 @@ module Iyyov
     end
 
     def default_pid_file
-      in_dir( name + '.pid' )
+      in_dir( init_name + '.pid' )
     end
 
     def default_log
-      in_dir( name + '.log' )
+      in_dir( init_name + '.log' )
     end
 
     # Return full path to file_name within run_dir
