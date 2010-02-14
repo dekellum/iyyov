@@ -7,31 +7,33 @@ require 'iyyov/shutdown_handler'
 
 module Iyyov
 
-  # Maintains a queue of Tasks to be executed at regular or periodic
+  # Maintains a queue of Task to be executed at fixed or periodic
   # times.
   class Scheduler
 
     # A task to be executed by the Scheduler
     class Task
-      attr_accessor :next_time
 
       # Regular interval between subsequent executions in seconds.
-      # The Period will be ignored if fixed_times is set.
-      # <numeric>
+      # <Numeric> (Default: nil : Use fixed_times)
       attr_accessor :period
 
       # One or more fixed time values in 24hour format, local
       # timezone, i.e: [ "11:30", "23:30" ]
-      # ~to_a[String]
+      # <~to_a[String]> (Default: nil : Use period)
       attr_accessor :fixed_times
 
       # Array or range for days of week in which fixed_times
       # apply. Days are 0 (Sunday) .. 6 (Saturday). Example: M-F == (1..5)
-      # ~include?( day_of_week ) (default: (0..6))
+      # <~include?( day_of_week )> (Default: (0..6))
       attr_accessor :fixed_days
 
       # Name the task for log reporting.
+      # FIXME: Remove?
       attr_accessor :name
+
+      # Once schedule succeeds, the absolute next time to execute.
+      attr_reader :next_time
 
       # New task given options matching accessors and block containing
       # work.
@@ -110,9 +112,9 @@ module Iyyov
       @queue.poll
     end
 
-    # Execute the specified block on exit. The Scheduler queue is
-    # drained such that the on_exit block is guaranteed to be the last
-    # to run.
+    # Execute the specified block on exit (in a shutdown thread.) The
+    # Scheduler queue is drained such that the on_exit block is
+    # guaranteed to be the last to run.
     def on_exit( &block )
       off_exit
       @shutdown_handler = ShutdownHandler.new do
@@ -126,6 +128,7 @@ module Iyyov
       end
     end
 
+    # Deregister any previously added on_exit block
     def off_exit
       @shutdown_handler.deregister if @shutdown_handler
       @shutdown_handler = nil
@@ -149,10 +152,9 @@ module Iyyov
             if ( top = peek )
               delta = top.next_time - now
               if delta <= 0.0
-                t = @queue.poll
-                unless t.run == :stop
-                  add( t, now )
-                end
+                t = poll
+                ret = t.run
+                add( t, now ) unless ( ret.is_a?( Symbol ) && ret == :stop )
                 next
               end
             else
