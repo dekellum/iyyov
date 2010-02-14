@@ -18,7 +18,7 @@
 $LOAD_PATH << './lib'
 
 require 'rubygems'
-gem     'rjack-tarpit', '~> 1.1.0'
+gem     'rjack-tarpit', '~> 1.2.0'
 require 'rjack-tarpit'
 
 require 'iyyov/base'
@@ -32,5 +32,21 @@ t.specify do |h|
                     [ 'logrotate',     '=  1.2.1' ] ]
   h.extra_dev_deps += [ [ 'minitest',    '~> 1.5.0' ] ]
 end
+
+task :check_init_versions do
+  t.test_line_match( 'init/iyyov-daemon',
+                      /^gem.+#{t.name}/, /= #{t.version}/ )
+end
+
+task :check_history_version do
+  t.test_line_match( 'History.rdoc', /^==/, / #{t.version} / )
+end
+task :check_history_date do
+  t.test_line_match( 'History.rdoc', /^==/, /\([0-9\-]+\)$/ )
+end
+
+task :gem  => [ :check_init_versions, :check_history_version ]
+task :tag  => [ :check_init_versions, :check_history_version, :check_history_date ]
+task :push => [ :check_history_date ]
 
 t.define_tasks
