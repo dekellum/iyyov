@@ -66,6 +66,7 @@ module Iyyov
         end
         LogRotate.rotate_file( log, opts )
       end
+      nil
     end
 
   end
