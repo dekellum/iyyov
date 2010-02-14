@@ -1,17 +1,19 @@
 #!/usr/bin/env jruby
-#. hashdot.vm.options      += -Xmx64m
 # -*- ruby -*-
+#. hashdot.vm.options += -Xmx64m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled
 
 $LOAD_PATH.unshift File.join( File.dirname(__FILE__), "..", "lib" )
 
 require 'rubygems'
 require 'rjack-logback'
 
-Logback.config_console( :level => Logback::DEBUG )
+Logback.config_console( :thread => true, :level => Logback::DEBUG )
 
 require 'iyyov'
 
 Iyyov.context do |c|
+
+  c.base_dir = '.'
 
   ARGV.each do |afile|
     c.load_file( afile )
