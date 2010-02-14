@@ -35,7 +35,7 @@ class TestDaemon < MiniTest::Unit::TestCase
   def teardown
     @context.event_loop #Confirm return
     @context.shutdown
-    %w[ hashdot-daemon hashdot-noexist ].each do |rdir|
+    %w[ hashdot-test-daemon hashdot-noexist ].each do |rdir|
       FileUtils.rm_rf( File.join( @tdir, rdir ) )
     end
   end
@@ -52,14 +52,14 @@ class TestDaemon < MiniTest::Unit::TestCase
   end
 
   def test_exe_path
-    d = Daemon.new( @context ) { |h| h.name = "hashdot-daemon" }
+    d = Daemon.new( @context ) { |h| h.name = "hashdot-test-daemon" }
     assert File.executable?( d.exe_path )
     @log.info d.exe_path
   end
 
   def test_invalid_init_name
     d = Daemon.new( @context ) do |h|
-      h.name = "hashdot-daemon"
+      h.name = "hashdot-test-daemon"
       h.init_name = "no-exist"
     end
     assert_equal( :stop, d.do_first( nil ) )
@@ -67,7 +67,7 @@ class TestDaemon < MiniTest::Unit::TestCase
 
   def test_invalid_run_dir
     d = Daemon.new( @context ) do |h|
-      h.name = "hashdot-daemon"
+      h.name = "hashdot-test-daemon"
       h.run_dir = "/no-permission"
     end
     assert_equal( :stop, d.do_first( nil ) )
@@ -80,7 +80,7 @@ class TestDaemon < MiniTest::Unit::TestCase
 
   def test_invalid_gem_version
     d = Daemon.new( @context ) do |h|
-      h.name = "hashdot-daemon"
+      h.name = "hashdot-test-daemon"
       h.version = "= 6.6.6"
     end
     assert_equal( :stop, d.do_first( nil ) )
