@@ -7,24 +7,64 @@ require 'iyyov/log_rotator'
 module Iyyov
   include RJack
 
-  # FIXME: GemDaemon has all the gem based specifics?
+  # A daemon isntance to start and monitor
   class Daemon
 
+    # Name of this daemon. Must be unique in combination with any
+    # specified instance.
+    # <String> (Required)
     attr_accessor :name
 
+    # Optional specific instance identifier, distinguishing this
+    # daemon from others of the same name. For example, a port number
+    # could be used.
+    # <Proc,~to_s> (Default: nil)
     attr_writer   :instance
+
+    # Full path to executable to start.
+    # <Proc,~to_s> (Default: compute from gem_name, init_name, and version)
     attr_writer   :exe_path
+
+    # Base directory under which run directories are found
+    # <Proc,~to_s> (Default: Context.base_dir)
     attr_writer   :base_dir
+
+    # Directory to execute under
+    # <Proc,~to_s> (Default: base_dir / full_name)
     attr_writer   :run_dir
+
+    # Whether to make run_dir, if not already present
+    # <Boolean> (Default: Context.make_run_dir )
     attr_accessor :make_run_dir
+
+    # Whether to stop this daemon when Iyyov exits
+    # <Boolean> (Default: Context.stop_on_exit)
     attr_accessor :stop_on_exit
+
+    # Duration in seconds between SIGTERM and final SIGKILL when
+    # stopping.
+    # <Numeric> (Default: Context.stop_delay)
     attr_accessor :stop_delay
 
+    # PID file written by the daemon process after start, containing
+    # the running daemon Process ID
+    # <Proc,~to_s> (Default: run_dir, init_name + '.pid')
     attr_writer   :pid_file
 
+    # The gem name used, in conjunction with version for gem-based default exe_path
+    # <Proc,~to_s> (Default: name)
     attr_writer   :gem_name
+
+    # The gem version requirements, i.e '~> 1.1.3'
+    # <Proc,~to_s,Array[~to_s]> (Default: '>= 0')
     attr_writer   :version
+
+    # The init script name used for gem-based default exe_path.
+    # <Proc,~to_s> (Default: name)
     attr_writer   :init_name
+
+    # Last found state of this daemon.
+    # <Symbol> (in STATES)
     attr_reader   :state
 
     # States tracked
@@ -34,6 +74,8 @@ module Iyyov
     LVARS = [ :@instance, :@exe_path, :@base_dir, :@run_dir, :@pid_file,
               :@gem_name, :@version, :@init_name ]
 
+    # New daemon given specified or default global
+    # Iyyov.context. Yields self to block for configuration.
     def initialize( context = Iyyov.context )
 
       @context      = context
@@ -56,12 +98,17 @@ module Iyyov
       @gem_spec     = nil
       @rotators     = {}
 
-      yield self
+      yield self if block_given?
 
       raise "name not specified" unless name
 
       @log = SLF4J[ [ SLF4J[ self.class ].name,
                       name, instance ].compact.join( '.' ) ]
+    end
+
+    # Given name + ( '-' + instance ) if provided.
+    def full_name
+      [ name, instance ].compact.join('-')
     end
 
     # Create a new LogRotator and yields it to block for
@@ -119,7 +166,7 @@ module Iyyov
     end
 
     def default_run_dir
-      File.join( base_dir, [ name, instance ].compact.join('-') )
+      File.join( base_dir, full_name )
     end
 
     def default_pid_file
