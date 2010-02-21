@@ -3,7 +3,8 @@
 #. hashdot.profile         += daemon
 #. hashdot.pid_file         = ./iyyov-daemon.pid
 #. hashdot.io_redirect.file = ./iyyov-daemon.log
-#. hashdot.vm.options += -Xmx64m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled
+#. hashdot.vm.options += -Xmx64m
+#. hashdot.vm.options += -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled
 
 require 'rubygems'
 

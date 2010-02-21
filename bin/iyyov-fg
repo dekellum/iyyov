@@ -1,22 +1,44 @@
 #!/usr/bin/env jruby
 # -*- ruby -*-
-#. hashdot.vm.options += -Xmx64m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled
+#. hashdot.vm.options += -Xmx64m
+#. hashdot.vm.options += -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled
 
 $LOAD_PATH.unshift File.join( File.dirname(__FILE__), "..", "lib" )
 
 require 'rubygems'
 require 'rjack-logback'
 
-Logback.config_console( :thread => true, :level => Logback::DEBUG )
+Logback.config_console( :thread => true, :lwidth => 35,
+                        :level => Logback::INFO )
 
+require 'optparse'
 require 'iyyov'
+
+OptionParser.new do |opts|
+  opts.banner = <<END
+Usage: iyyov-fg [options] <job-config-files>
+Run iyyov in foreground for testing job-config-files.
+Default base_dir for daemons is CWD.
+Options:
+END
+
+  opts.on( "-d", "--debug", "Enable debug logging" ) do
+    Logback.root.level = Logback::DEBUG
+  end
+
+  opts.on( "-v", "--version", "Show version and exit" ) do
+    puts "Iyyov (#{$0}) version: #{ Iyyov::VERSION }"
+    exit
+  end
+
+end.parse!
 
 Iyyov.context do |c|
 
+  # -fg specific defaults
   c.base_dir = '.'
+  c.stop_on_exit = true
 
-  ARGV.each do |afile|
-    c.load_file( afile )
-  end
+  ARGV.each { |afile| c.load_file( afile ) }
   c.event_loop
 end
