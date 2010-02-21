@@ -1,5 +1,5 @@
 require 'iyyov/base'
-
+require 'iyyov/task'
 require 'iyyov/scheduler'
 require 'iyyov/daemon'
 
@@ -68,7 +68,7 @@ module Iyyov
     end
 
     def schedule_at( opts = {}, &block )
-      t = Scheduler::Task.new( opts, &block )
+      t = Task.new( opts, &block )
       @scheduler.add( t )
     end
 
@@ -89,8 +89,8 @@ module Iyyov
 
     def register_tasks
       @rotators.values.each do |lr|
-        t = Scheduler::Task.new( :name => rotate_name( lr.log ),
-                                 :period => lr.check_period ) do
+        t = Task.new( :name => rotate_name( lr.log ),
+                      :period => lr.check_period ) do
           lr.check_rotate do |rlog|
             @log.info { "Rotating log #{rlog}" }
           end

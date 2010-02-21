@@ -19,6 +19,7 @@
 require File.join( File.dirname( __FILE__ ), "setup" )
 
 require 'iyyov/scheduler'
+require 'iyyov/task'
 
 class TestScheduler < MiniTest::Unit::TestCase
   include Iyyov
@@ -26,7 +27,7 @@ class TestScheduler < MiniTest::Unit::TestCase
   def test_run
     counter = 0
     s = Scheduler.new
-    tk = Scheduler::Task.new( :period => 0.001 ) do
+    tk = Task.new( :period => 0.001 ) do
       counter += 1
       assert( counter <= 2 )
       :stop unless counter < 2
@@ -36,7 +37,7 @@ class TestScheduler < MiniTest::Unit::TestCase
   end
 
   def test_fixed_times
-    tk = Scheduler::Task.new( :fixed_times => %w[ 6:00 8:00 10:00 12:00 ] )
+    tk = Task.new( :fixed_times => %w[ 6:00 8:00 10:00 12:00 ] )
 
     assert_next_time_from( tk, '2010-02-08T08:00', '2010-02-08T10:00' )
 
