@@ -29,7 +29,6 @@ module Iyyov
       attr_accessor :fixed_days
 
       # Name the task for log reporting.
-      # FIXME: Remove?
       attr_accessor :name
 
       # Once schedule succeeds, the absolute next time to execute.
@@ -46,15 +45,19 @@ module Iyyov
 
         opts.each { |k,v| send( k.to_s + '=', v ) }
 
-        #FIXME: Validation.
-
         @block = block
+
+        #FIXME: Validation?
+
+        @log = SLF4J[ [ SLF4J[ self.class ].name, name ].compact.join( '.' ) ]
+        @log.info { "Task created : #{ opts.inspect }" }
       end
 
       # Execute the task, after which the task will be scheduled again
       # in period time or for the next of fixed_times, unless :stop is
       # returned.
       def run
+        @log.debug "Running."
         @block.call if @block
       end
 
@@ -68,7 +71,15 @@ module Iyyov
           @next_time = ( now + period )
         end
 
+        if @next_time && ( @next_time - now ) > 60.0
+          @log.debug { "Next run scheduled @ #{ next_time_to_s }" }
+        end
+
         @next_time
+      end
+
+      def next_time_to_s
+        @next_time.strftime( '%Y-%m-%dT%H:%M:%S' ) if @next_time
       end
 
       def next_fixed_time( now )

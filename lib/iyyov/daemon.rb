@@ -146,9 +146,11 @@ module Iyyov
     end
 
     def tasks
-      t = [ Scheduler::Task.new( :period => 5.0 ) { start_check } ]
+      t = [ Scheduler::Task.new( :name => full_name,
+                                 :period => 5.0 ) { start_check } ]
       t += @rotators.values.map do |lr|
-        Scheduler::Task.new( :period => lr.check_period ) do
+        Scheduler::Task.new( :name => "#{full_name}.rotate",
+                             :period => lr.check_period ) do
           lr.check_rotate( pid ) do |rlog|
             @log.info { "Rotating log #{rlog}" }
           end

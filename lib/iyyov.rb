@@ -68,10 +68,7 @@ module Iyyov
     end
 
     def schedule_at( opts = {}, &block )
-      t = Scheduler::Task.new( opts ) do
-        @log.info { "scheduled at : #{ opts.inspect }" }
-        block.call
-      end
+      t = Scheduler::Task.new( opts, &block )
       @scheduler.add( t )
     end
 
@@ -92,13 +89,18 @@ module Iyyov
 
     def register_tasks
       @rotators.values.each do |lr|
-        t = Scheduler::Task.new( :period => lr.check_period ) do
+        t = Scheduler::Task.new( :name => rotate_name( lr.log ),
+                                 :period => lr.check_period ) do
           lr.check_rotate do |rlog|
             @log.info { "Rotating log #{rlog}" }
           end
         end
         @scheduler.add( t )
       end
+    end
+
+    def rotate_name( log_file )
+      "#{ File.basename( log_file, ".log" ) }.rotate"
     end
 
     def event_loop
