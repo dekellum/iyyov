@@ -26,7 +26,7 @@ module Iyyov
       #FIXME: Support other gem home than ours?
 
       @rotators  = {}
-      @daemons   = []
+      @daemons   = {}
       @state     = :begin
       @log = RJack::SLF4J[ self.class ]
       @scheduler = Scheduler.new
@@ -46,7 +46,7 @@ module Iyyov
     def do_shutdown
       unless @state == :shutdown
         @log.debug "Shutting down"
-        @daemons.each { |d| d.do_exit }
+        @daemons.values.each { |d| d.do_exit }
         @state = :shutdown
       end
     end
@@ -77,7 +77,10 @@ module Iyyov
 
     def define_daemon( &block )
       d = Daemon.new( self, &block )
-      @daemons << d
+      if @daemons.has_key?( d.full_name )
+        raise "Can't define daemon with duplicate full_name = #{d.full_name}"
+      end
+      @daemons[ d.full_name ] = d
       d.do_first( @scheduler )
       nil
     end
