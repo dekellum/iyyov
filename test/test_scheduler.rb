@@ -27,7 +27,7 @@ class TestScheduler < MiniTest::Unit::TestCase
   def test_run
     counter = 0
     s = Scheduler.new
-    tk = Task.new( :period => 0.001 ) do
+    tk = Task.new( :name => "test_run", :period => 0.001 ) do
       counter += 1
       assert( counter <= 2 )
       :stop unless counter < 2
@@ -52,6 +52,20 @@ class TestScheduler < MiniTest::Unit::TestCase
       assert_equal( tp( expected ), tk.next_fixed_time( tp( now ) ) )
       tk.fixed_times = tk.fixed_times.reverse
     end
+  end
+
+  def test_shutdown
+    s = Scheduler.new
+    s.on_exit { flunk "Shouldn't make it here" }
+    counter = 0
+    tk = Task.new( :name => "test_shutdown", :period => 0.001 ) do
+      counter += 1
+      assert( counter <= 2 )
+      :shutdown unless counter < 2
+    end
+    s.add( tk )
+    s.add( Task.new( :period => 5.0 ) { flunk "nor here" } )
+    s.event_loop
   end
 
   def tp( t )

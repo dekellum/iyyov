@@ -65,12 +65,23 @@ module Iyyov
 
           # While the top task is ready..
           loop do
-            if ( top = peek )
-              delta = top.next_time - now
+            if ( task = peek )
+              delta = task.next_time - now
               if delta <= 0.0
-                t = poll
-                ret = t.run
-                add( t, now ) unless ( ret.is_a?( Symbol ) && ret == :stop )
+                task = poll
+
+                retsym = task.run
+                retsym = :continue unless retsym.is_a?( Symbol )
+                case retsym
+                when :stop
+                  #drop and continue
+                when :shutdown
+                  @queue.clear
+                  off_exit
+                  #drop and fall through
+                else
+                  add( task, now )
+                end
                 next
               end
             else
