@@ -14,7 +14,7 @@ Logback.config_console( :thread => true, :lwidth => 35,
 require 'optparse'
 require 'iyyov'
 
-OptionParser.new do |opts|
+oparser = OptionParser.new do |opts|
   opts.banner = <<END
 Usage: iyyov-fg [options] <job-config-files>
 Run iyyov in foreground for testing job-config-files.
@@ -31,7 +31,13 @@ END
     exit
   end
 
-end.parse!
+end
+
+oparser.parse!
+if ARGV.empty?
+  puts oparser.help
+  exit 1
+end
 
 Iyyov.context do |c|
 
