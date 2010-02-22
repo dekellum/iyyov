@@ -45,6 +45,6 @@ Iyyov.context do |c|
   c.base_dir = '.'
   c.stop_on_exit = true
 
-  ARGV.each { |afile| c.load_file( afile ) }
+  ARGV.each { |afile| c.load_file( afile, true ) }
   c.event_loop
 end

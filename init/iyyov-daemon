@@ -17,7 +17,7 @@ require 'iyyov'
 
 Iyyov.context do |c|
   ARGV.each do |afile|
-    c.load_file( afile )
+    c.load_file( afile, true )
   end
   c.event_loop
 end

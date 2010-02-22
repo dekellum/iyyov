@@ -14,6 +14,10 @@ module Iyyov
     attr_accessor :stop_on_exit
     attr_accessor :stop_delay
 
+    # Watch loaded config files for changes
+    # <Boolean) (Default: true)
+    attr_accessor :watch_files
+
     # Private?
     attr_reader   :scheduler
 
@@ -22,6 +26,7 @@ module Iyyov
       @make_run_dir = true
       @stop_on_exit = false
       @stop_delay   = 30.0
+      @watch_files  = true
 
       #FIXME: Support other gem home than ours?
 
@@ -31,6 +36,8 @@ module Iyyov
       @log = RJack::SLF4J[ self.class ]
       @scheduler = Scheduler.new
       @scheduler.on_exit { do_shutdown }
+      @files     = {}
+      @root_files = []
 
       # By default with potential for override
       iyyov_log_rotate
@@ -78,16 +85,21 @@ module Iyyov
         raise "Can't define daemon with duplicate full_name = #{d.full_name}"
       end
       @daemons[ d.full_name ] = d
-      d.do_first( @scheduler )
       nil
     end
 
-    def load_file( file )
+    def load_file( file, is_root = false )
       @log.info { "Loading #{file}" }
-      load file
+      begin
+        load file
+        @files[ file ] = File.stat( file ).mtime
+        @root_files << file if is_root
+      rescue ScriptError, StandardError => e
+        @log.error( "On load of #{file}", e )
+      end
     end
 
-    def register_tasks
+    def register_rotator_tasks
       @rotators.values.each do |lr|
         t = Task.new( :name => rotate_name( lr.log ),
                       :period => lr.check_period ) do
@@ -99,23 +111,45 @@ module Iyyov
       end
     end
 
+    def register_files_watch_task
+      return unless @watch_files && ! @files.empty?
+      t = Task.new( :name => "watch-files", :period => 11.0 ) do
+        @files.each do |fname, last_time|
+          begin
+            new_time = File.stat( fname ).mtime
+            if new_time != last_time
+              @log.info { "#{fname} has new time #{new_time}!" }
+            end
+          rescue Errno::ENOENT, Errno::EACCES => e
+            @log.error( e.to_s )
+          end
+        end
+        nil
+      end
+      @scheduler.add( t )
+    end
+
+    def start_and_register_daemons
+      @daemons.values.each { |d| d.do_first( @scheduler ) }
+    end
+
     def rotate_name( log_file )
       "#{ File.basename( log_file, ".log" ) }.rotate"
     end
 
     def event_loop
-      register_tasks #FIXME: Better place for this?
+      start_and_register_daemons
+      register_rotator_tasks
+      register_files_watch_task
 
       @log.debug "Event loop starting"
       @scheduler.event_loop
       @log.debug "Event loop exited"
     end
-
   end
 
-  @context = Context.new
-
   def self.context
+    @context ||= Context.new
     yield @context if block_given?
     @context
   end

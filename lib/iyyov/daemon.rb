@@ -25,6 +25,10 @@ module Iyyov
     # <Proc,~to_s> (Default: compute from gem_name, init_name, and version)
     attr_writer   :exe_path
 
+    # Any additional args to use on start
+    # <Proc,Array[~to_s]> (Default: [])
+    attr_writer   :args
+
     # Base directory under which run directories are found
     # <Proc,~to_s> (Default: Context.base_dir)
     attr_writer   :base_dir
@@ -67,11 +71,17 @@ module Iyyov
     # <Symbol> (in STATES)
     attr_reader   :state
 
+    # Once do_first is called and provided a gem is found (gem version
+    # specified).
+    # <Gem::Specification>
+    # FIXME: May not want to expose this.
+    attr_reader   :gem_spec
+
     # States tracked
     STATES = [ :begin, :up, :failed, :stopped ]
 
     # Instance variables which may be set as Procs
-    LVARS = [ :@instance, :@exe_path, :@base_dir, :@run_dir, :@pid_file,
+    LVARS = [ :@instance, :@exe_path, :@args, :@base_dir, :@run_dir, :@pid_file,
               :@gem_name, :@version, :@init_name ]
 
     # New daemon given specified or default global
@@ -83,6 +93,7 @@ module Iyyov
 
       @instance     = nil
       @exe_path     = method :gem_exe_path
+      @args         = []
       @base_dir     = method :default_base_dir
       @run_dir      = method :default_run_dir
       @make_run_dir = @context.make_run_dir
@@ -198,15 +209,16 @@ module Iyyov
 
     def start
       epath = File.expand_path( exe_path )
+      eargs = args.to_a.map { |a| a.to_s.strip }.compact
       aversion = @gem_spec && @gem_spec.version
-      @log.info { "starting #{aversion}" }
+      @log.info { ( [ "starting", aversion || epath ] + eargs ).join(' ') }
 
       unless File.executable?( epath )
         raise( DaemonFailed, "Exe path: #{epath} not found/executable." )
       end
 
       Dir.chdir( run_dir ) do
-        system( epath ) or raise( DaemonFailed, "Start failed with #{$?}" )
+        system( epath, *eargs ) or raise( DaemonFailed, "Start failed with #{$?}" )
       end
 
       @state = :up
@@ -215,6 +227,14 @@ module Iyyov
       @log.error( e.to_s )
       @state = :failed
       false
+    end
+
+    # Return array suitable for comparing this daemon with prior
+    # running instance.
+    def exec_key
+      keys = [ run_dir, exe_path ].map { |p| File.expand_path( p ) }
+      keys += args.to_a.map { |a| a.to_s.strip }.compact
+      keys.compact
     end
 
     def start_check
@@ -293,9 +313,4 @@ module Iyyov
   end
 
   class DaemonFailed < StandardError; end
-
-  # FIXME: Add configuration/collection watch poll mechanism, which would allow
-  # additions,upgrades,etc. to be gracefully handled. Do some use cases.
-
-  # GC monitoring could be done from here as well.
 end
