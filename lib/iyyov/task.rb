@@ -1,5 +1,6 @@
 require 'date'
 require 'time'
+require 'thread'
 
 module Iyyov
 
@@ -21,7 +22,13 @@ module Iyyov
     attr_accessor :fixed_days
 
     # Name the task for log reporting.
+    # <String> (Default: nil)
     attr_accessor :name
+
+    # Execution mode. If :async, run in separate thread, but only
+    # allow one thread for this task to run at any time.
+    # <:sync|:async> (Default: :sync)
+    attr_accessor :mode
 
     # Once schedule succeeds, the absolute next time to execute.
     attr_reader :next_time
@@ -42,6 +49,10 @@ module Iyyov
       #FIXME: Validation?
 
       @log = SLF4J[ [ SLF4J[ self.class ].name, name ].compact.join( '.' ) ]
+
+      @lock = ( Mutex.new if mode == :async )
+      @async_rc = nil
+
       @log.info { "Task created : #{ opts.inspect }" }
     end
 
@@ -49,8 +60,42 @@ module Iyyov
     # in period time or for the next of fixed_times, unless :stop is
     # returned.
     def run
+      rc = :continue
+      if mode == :async
+        if ( @async_rc == :stop ) || ( @async_rc == :shutdown )
+          rc = @async_rc
+        else
+          run_thread
+        end
+      else
+        rc = run_direct
+      end
+      rc
+    end
+
+    def run_thread
+      Thread.new do
+        if @lock.try_lock
+          begin
+            @async_rc = run_direct
+          ensure
+            @lock.unlock
+          end
+        else
+          @log.warn "Already running, skipping this run."
+        end
+      end
+    end
+
+    def run_direct
       @log.debug "Running."
-      @block.call if @block
+      rc = ( @block.call if @block )
+      #FIXME: Errors to handle?
+      filter( rc )
+    end
+
+    def filter( rc )
+      rc.is_a?( Symbol ) ? rc : :continue
     end
 
     # Determine next_time from now based on period or fixed_times

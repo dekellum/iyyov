@@ -75,9 +75,7 @@ module Iyyov
               if delta <= 0.0
                 task = poll
 
-                retsym = task.run
-                retsym = :continue unless retsym.is_a?( Symbol )
-                case retsym
+                case task.run
                 when :stop
                   #drop and continue
                 when :shutdown
