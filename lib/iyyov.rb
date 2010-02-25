@@ -14,12 +14,13 @@ module Iyyov
     attr_accessor :stop_on_exit
     attr_accessor :stop_delay
 
-    # Watch loaded config files for changes
-    # <Boolean) (Default: true)
+    # Watch loaded config files for changes?
+    # <Boolean> (Default: true)
     attr_accessor :watch_files
 
     # Private?
     attr_reader   :scheduler
+    attr_reader   :daemons
 
     def initialize
       @base_dir     = "/opt/var"
@@ -94,8 +95,10 @@ module Iyyov
         load file
         @files[ file ] = File.stat( file ).mtime
         @root_files << file if is_root
+        true
       rescue ScriptError, StandardError => e
         @log.error( "On load of #{file}", e )
+        false
       end
     end
 
@@ -114,17 +117,29 @@ module Iyyov
     def register_files_watch_task
       return unless @watch_files && ! @files.empty?
       t = Task.new( :name => "watch-files", :period => 11.0 ) do
+        reload = false
         @files.each do |fname, last_time|
           begin
             new_time = File.stat( fname ).mtime
             if new_time != last_time
-              @log.info { "#{fname} has new time #{new_time}!" }
+              @log.info { "#{fname} has new modification time, reloading." }
+              reload = true
+              break
             end
           rescue Errno::ENOENT, Errno::EACCES => e
             @log.error( e.to_s )
           end
         end
-        nil
+        rc = :continue
+        if reload
+          @log.info { "Rescaning gems." }
+          Gem.clear_paths
+          if Iyyov.load_root_files( @root_files )
+            @log.info "Load passed, shutdown"
+            rc = :shutdown
+          end
+        end
+        rc
       end
       @scheduler.add( t )
     end
@@ -143,14 +158,50 @@ module Iyyov
       register_files_watch_task
 
       @log.debug "Event loop starting"
-      @scheduler.event_loop
-      @log.debug "Event loop exited"
+      rc = @scheduler.event_loop
+      @log.debug { "Event loop exited: #{rc.inspect}" }
+      rc
     end
   end
 
+  @context = nil
+
   def self.context
-    @context ||= Context.new
+    #FIXME: @context ||= Context.new
+    raise "FIXME: Bad state!!!" unless @context
     yield @context if block_given?
     @context
   end
+
+  def self.load_root_files( files )
+    old_context = @context
+    @context = Context.new
+    yield @context if block_given?
+    all_success = true
+    files.each { |cfile| all_success &&= @context.load_file( cfile, true ) }
+
+    if old_context
+      if all_success
+        old_context.daemons.each do |name,odaemon|
+          ndaemon = @context.daemons[name]
+          odaemon.stop unless ndaemon && ndaemon.exec_key == odaemon.exec_key
+        end
+      else
+        @context = old_context
+      end
+    end
+
+    #FIXME: @context.@state?
+
+    all_success
+  end
+
+  def self.run
+    continue = true
+    while( continue && @context )
+      rc = @context.event_loop
+      continue = ( rc == :shutdown )
+    end
+  end
+
 end

@@ -34,17 +34,17 @@ END
 end
 
 oparser.parse!
+
 if ARGV.empty?
   puts oparser.help
   exit 1
 end
 
-Iyyov.context do |c|
-
+#FIXME: Custom Block is lost on subsequent reload.
+Iyyov.load_root_files( ARGV ) do |c|
   # -fg specific defaults
   c.base_dir = '.'
   c.stop_on_exit = true
-
-  ARGV.each { |afile| c.load_file( afile, true ) }
-  c.event_loop
 end
+
+Iyyov.run

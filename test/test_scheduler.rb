@@ -65,7 +65,7 @@ class TestScheduler < MiniTest::Unit::TestCase
     end
     s.add( tk )
     s.add( Task.new( :period => 5.0 ) { flunk "nor here" } )
-    s.event_loop
+    assert_equal( :shutdown, s.event_loop )
   end
 
   def tp( t )

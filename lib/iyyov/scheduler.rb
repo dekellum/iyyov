@@ -84,7 +84,7 @@ module Iyyov
                   @log.debug "Begin scheduler shutdown sequence."
                   @queue.clear
                   off_exit
-                  #drop and fall through
+                  return :shutdown #FIXME: Replace with rc?
                 else
                   add( task, now )
                 end
@@ -100,6 +100,7 @@ module Iyyov
         break unless delta && delta > 0.0
         sleep delta
       end
+      nil
     end
 
     # Implement java.util.Comparator on task.next_time values
