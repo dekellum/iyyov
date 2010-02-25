@@ -14,6 +14,7 @@ module Iyyov
       @queue = Java::java.util.PriorityQueue.new( 67, TimeComp.new )
       @lock = Mutex.new
       @shutdown_handler = nil
+      @log = SLF4J[ self.class ]
     end
 
     def add( t, now = Time.now )
@@ -42,12 +43,16 @@ module Iyyov
           block.call
         end
       end
+      @log.debug { "Registered exit: #{ @shutdown_handler.handler }" }
     end
 
     # Deregister any previously added on_exit block
     def off_exit
-      @shutdown_handler.deregister if @shutdown_handler
-      @shutdown_handler = nil
+      if @shutdown_handler
+        @log.debug { "Unregistered exit: #{ @shutdown_handler.handler }" }
+        @shutdown_handler.unregister
+        @shutdown_handler = nil
+      end
     end
 
     # Loop forever executing tasks or waiting for the next to be ready
@@ -76,6 +81,7 @@ module Iyyov
                 when :stop
                   #drop and continue
                 when :shutdown
+                  @log.debug "Begin scheduler shutdown sequence."
                   @queue.clear
                   off_exit
                   #drop and fall through
