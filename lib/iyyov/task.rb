@@ -62,13 +62,28 @@ module Iyyov
     def run
       rc = :continue
       if mode == :async
-        if ( @async_rc == :stop ) || ( @async_rc == :shutdown )
-          rc = @async_rc
-        else
-          run_thread
-        end
+        rc = test_async_return_code
+        run_thread if rc == :continue
       else
         rc = run_direct
+      end
+      rc
+    end
+
+    def test_async_return_code
+      rc = :continue
+      # Note: Currently only the main event loop thread goes here and
+      # so the only case for contention is this task already running
+      # in run_thread. In this case we can warn + :skip early.
+      if @lock.try_lock
+        begin
+          rc = @async_rc if ( @async_rc == :stop ) || ( @async_rc == :shutdown )
+        ensure
+          @lock.unlock
+        end
+      else
+        @log.warn "Already running, (pre) skipping this run."
+        rc = :skip
       end
       rc
     end
