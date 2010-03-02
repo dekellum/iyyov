@@ -54,7 +54,7 @@ module Iyyov
 
     def do_shutdown
       unless @state == :shutdown
-        @log.debug "Shutting down"
+        @log.info "Shutting down"
         @daemons.values.each { |d| d.do_exit }
         @state = :shutdown
       end
@@ -98,7 +98,7 @@ module Iyyov
         @files[ file ] = File.stat( file ).mtime
         @root_files << file if is_root
         true
-      rescue ScriptError, StandardError => e
+      rescue SetupError, ScriptError, StandardError => e
         @log.error( "On load of #{file}", e )
         false
       end
