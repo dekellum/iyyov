@@ -8,26 +8,31 @@ module Iyyov
   class Task
 
     # Regular interval between subsequent executions in seconds.
-    # <Numeric> (Default: nil : Use fixed_times)
+    #
+    # Numeric (default: nil, use fixed_times)
     attr_accessor :period
 
     # One or more fixed time values in 24hour format, local
     # timezone, i.e: [ "11:30", "23:30" ]
-    # <~to_a[String]> (Default: nil : Use period)
+    #
+    # ~to_a[String] (default: nil, use period)
     attr_accessor :fixed_times
 
-    # Array or range for days of week in which fixed_times
-    # apply. Days are 0 (Sunday) .. 6 (Saturday). Example: M-F == (1..5)
-    # <~include?( day_of_week )> (Default: (0..6))
+    # Array or range for days of week in which fixed_times apply. Days
+    # are 0 (Sunday) .. 6 (Saturday). Example: M-F == (1..5)
+    #
+    # ~include?( day_of_week ) (default: (0..6))
     attr_accessor :fixed_days
 
     # Name the task for log reporting.
-    # <String> (Default: nil)
+    #
+    # String (default: nil)
     attr_accessor :name
 
     # Execution mode. If :async, run in separate thread, but only
     # allow one thread for this task to run at any time.
-    # <:sync|:async> (Default: :sync)
+    #
+    # Symbol :sync|:async (default: :sync)
     attr_accessor :mode
 
     # Once schedule succeeds, the absolute next time to execute.

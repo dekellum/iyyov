@@ -10,16 +10,33 @@ require 'iyyov/daemon'
 module Iyyov
 
   class Context
+
+    # Default base directory under which Daemon run directories are found
+    #
+    # ~to_s (default: /opt/var)
     attr_accessor :base_dir
+
+    # Default whether to make Daemon run directories if not already present.
+    #
+    # Boolean (default: true)
     attr_accessor :make_run_dir
+
+    # Default whether to stop Daemons on Iyyov exit.
+    #
+    # Boolean (default: false)
     attr_accessor :stop_on_exit
+
+    # Default duration in seconds between SIGTERM and final SIGKILL when
+    # stopping Daemons.
+    #
+    # Numeric (default: 30.0)
     attr_accessor :stop_delay
 
     # Watch loaded config files for changes?
-    # <Boolean> (Default: true)
+    #
+    # Boolean (default: true)
     attr_accessor :watch_files
 
-    # Private?
     attr_reader   :scheduler
     attr_reader   :daemons
 
@@ -156,12 +173,15 @@ module Iyyov
     end
 
     def event_loop
+      @state = :starting
       start_and_register_daemons
       register_rotator_tasks
       register_files_watch_task
 
       @log.debug "Event loop starting"
+      @state = :running
       rc = @scheduler.event_loop
+      @state = :exit
       @log.debug { "Event loop exited: #{rc.inspect}" }
       rc
     end

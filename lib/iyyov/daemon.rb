@@ -12,68 +12,84 @@ module Iyyov
 
     # Name of this daemon. Must be unique in combination with any
     # specified instance.
-    # <String> (Required)
+    #
+    # String (required)
     attr_accessor :name
 
     # Optional specific instance identifier, distinguishing this
     # daemon from others of the same name. For example, a port number
     # could be used.
-    # <Proc,~to_s> (Default: nil)
+    #
+    # Proc,~to_s (default: nil)
     attr_writer   :instance
 
     # Full path to executable to start.
-    # <Proc,~to_s> (Default: compute from gem_name, init_name, and version)
+    #
+    # Proc,~to_s (default: compute from gem_name, init_name, and version)
     attr_writer   :exe_path
 
     # Any additional args to use on start
-    # <Proc,Array[~to_s]> (Default: [])
+    #
+    # Proc,Array[~to_s] (default: [])
     attr_writer   :args
 
     # Base directory under which run directories are found
-    # <Proc,~to_s> (Default: Context.base_dir)
+    #
+    # Proc,~to_s (default: Context.base_dir)
     attr_writer   :base_dir
 
     # Directory to execute under
-    # <Proc,~to_s> (Default: base_dir / full_name)
+    #
+    # Proc,~to_s (default: base_dir / full_name)
     attr_writer   :run_dir
 
     # Whether to make run_dir, if not already present
-    # <Boolean> (Default: Context.make_run_dir )
+    #
+    # Boolean (default: Context.make_run_dir )
     attr_accessor :make_run_dir
 
     # Whether to stop this daemon when Iyyov exits
-    # <Boolean> (Default: Context.stop_on_exit)
+    #
+    # Boolean (default: Context.stop_on_exit)
     attr_accessor :stop_on_exit
 
     # Duration in seconds between SIGTERM and final SIGKILL when
     # stopping.
-    # <Numeric> (Default: Context.stop_delay)
+    #
+    # Numeric (default: Context.stop_delay)
     attr_accessor :stop_delay
 
     # PID file written by the daemon process after start, containing
     # the running daemon Process ID
-    # <Proc,~to_s> (Default: run_dir, init_name + '.pid')
+    #
+    # Proc,~to_s (default: run_dir, init_name + '.pid')
     attr_writer   :pid_file
 
-    # The gem name used, in conjunction with version for gem-based default exe_path
-    # <Proc,~to_s> (Default: name)
+    # The gem name used, in conjunction with version for gem-based
+    # default exe_path
+    #
+    # Proc,~to_s (default: name)
     attr_writer   :gem_name
 
     # The gem version requirements, i.e '~> 1.1.3'
-    # <Proc,~to_s,Array[~to_s]> (Default: '>= 0')
+    #
+    # Proc,~to_s,Array[~to_s] (default: '>= 0')
     attr_writer   :version
 
     # The init script name used for gem-based default exe_path.
-    # <Proc,~to_s> (Default: name)
+    #
+    # Proc,~to_s (default: name)
     attr_writer   :init_name
 
     # Last found state of this daemon.
-    # <Symbol> (in STATES)
+    #
+    # Symbol (in STATES)
     attr_reader   :state
 
     # Once do_first is called and provided a gem is found (gem version
     # specified).
-    # <Gem::Specification>
+    #
+    # Gem::Specification
     # FIXME: May not want to expose this.
     attr_reader   :gem_spec
 

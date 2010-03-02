@@ -7,35 +7,45 @@ module Iyyov
   class LogRotator
 
     # Full path to log file to check and rotate
-    # <String>:: path (required)
+    #
+    # String (required)
     attr_accessor :log
 
     # Maximum log size triggering rotation
-    # <Fixnum>:: bytes (default: 256M bytes)
+    #
+    # Fixnum bytes (default: 256M bytes)
     attr_accessor :max_size
 
     # Number of rotated logs in addition to active log.
-    # <Fixnum>:: rotations (default: 3)
+    #
+    # Fixnum (default: 3)
     attr_accessor :count
 
     # GZIP compress rotated logs?
-    # <Boolean>:: (default: true)
+    #
+    # Boolean (default: true)
     attr_accessor :gzip
 
     # The signal to use post rotation (but before gzip) requesting
     # that the daemon reopen its logs.
-    # <String>:: (default: "HUP")
+    #
+    # String (default: "HUP")
     attr_accessor :signal
 
     # Period between subsequent checks for rotation (default: 300.0)
-    # <Float>:: seconds
+    #
+    # Float seconds
     attr_accessor :check_period
 
     # Process ID to signal (if known in advance/constant, i.e. 0 for
     # this process)
+    #
+    # Fixnum
     attr_writer :pid
 
-    # mb<Fixnum>:: Set max_size in megabytes
+    # Set max_size in megabytes
+    #
+    # mb<Fixnum>:: megabytes
     def max_size_mb=( mb )
       @max_size = mb * 1024 * 1024
     end

@@ -1,4 +1,5 @@
 
 module Iyyov
- VERSION = '1.0.0'
+  # Iyyov version
+  VERSION = '1.0.0'
 end
