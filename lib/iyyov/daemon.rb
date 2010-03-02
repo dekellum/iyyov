@@ -160,6 +160,7 @@ module Iyyov
       t = [ Task.new( :name => full_name, :period => 5.0 ) { start_check } ]
       t += @rotators.values.map do |lr|
         Task.new( :name => "#{full_name}.rotate",
+                  :mode => :async,
                   :period => lr.check_period ) do
           lr.check_rotate( pid ) do |rlog|
             @log.info { "Rotating log #{rlog}" }

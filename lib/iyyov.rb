@@ -105,6 +105,7 @@ module Iyyov
     def register_rotator_tasks
       @rotators.values.each do |lr|
         t = Task.new( :name => rotate_name( lr.log ),
+                      :mode => :async,
                       :period => lr.check_period ) do
           lr.check_rotate do |rlog|
             @log.info { "Rotating log #{rlog}" }
