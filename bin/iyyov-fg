@@ -40,11 +40,8 @@ if ARGV.empty?
   exit 1
 end
 
-#FIXME: Custom Block is lost on subsequent reload.
-Iyyov.load_root_files( ARGV ) do |c|
-  # -fg specific defaults
+Iyyov.run( ARGV ) do |c|
+  # iyyov-fg specific defaults
   c.base_dir = '.'
   c.stop_on_exit = true
 end
-
-Iyyov.run

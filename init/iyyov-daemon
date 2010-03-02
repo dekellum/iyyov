@@ -15,9 +15,4 @@ RJack::Logback.config_console( :full => true, :thread => true )
 
 require 'iyyov'
 
-Iyyov.context do |c|
-  ARGV.each do |afile|
-    c.load_file( afile, true )
-  end
-  c.event_loop
-end
+Iyyov.run( ARGV )
