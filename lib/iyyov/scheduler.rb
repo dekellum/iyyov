@@ -55,53 +55,44 @@ module Iyyov
       end
     end
 
-    # Loop forever executing tasks or waiting for the next to be ready
-    # Will return when the queue is empty (which may be arranged by
-    # on_exit)
+    # Loop forever executing tasks or waiting for the next to be
+    # ready. Return only when the queue is empty (which may be arranged by
+    # on_exit) or if a Task returns :shutdown.
     def event_loop
-      delta = nil
+      rc = nil
 
-      # While there is some task remaining and therefore some time to
-      # wait...
-      loop do
+      # While not shutdown
+      while ( rc != :shutdown )
         now = Time.now
+        delta = 0.0
 
         @lock.synchronize do
+          # While we don't need to wait, and a task is available
+          while ( delta <= 0.0 && ( task = peek ) && rc != :shutdown )
+            delta = task.next_time - now
 
-          # While the top task is ready..
-          loop do
-            if ( task = peek )
-              delta = task.next_time - now
-              if delta <= 0.0
-                task = poll
+            if delta <= 0.0
+              task = poll
 
-                case task.run
-                when :stop
-                  #drop and continue
-                when :shutdown
-                  @log.debug "Begin scheduler shutdown sequence."
-                  @queue.clear
-                  off_exit
-                  return :shutdown #FIXME: Replace with rc?
-                else
-                  add( task, now )
-                end
-                next
-              end
-            else
-              delta = nil
+              rc = task.run
+              add( task, now ) unless ( rc == :shutdown || rc == :stop )
             end
-            break
           end
+        end #lock
 
-        end
-        break unless delta && delta > 0.0
+        break unless delta > 0.0
         sleep delta
       end
-      nil
+
+      if rc == :shutdown
+        @log.debug "Begin scheduler shutdown sequence."
+        @queue.clear
+        off_exit
+      end
+      rc
     end
 
-    # Implement java.util.Comparator on task.next_time values
+    # Implements java.util.Comparator over task.next_time values
     class TimeComp
       include Java::java.util.Comparator
       def compare( p, n )
