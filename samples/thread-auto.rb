@@ -1,5 +1,3 @@
-require 'thread'
-
 Iyyov.context do |c|
   count = 0
   log = SLF4J["hello-auto"]

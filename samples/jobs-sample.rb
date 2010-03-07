@@ -1,5 +1,3 @@
-# Standallone startup?!?
-
 Iyyov.watch do |d|
   d.name     = "hashdot-daemon"
   port       = 3333
@@ -14,10 +12,11 @@ Iyyov.watch do |d|
     r.hup         = true
   end
 
+  # FIXME: prototype
   d.backup do |b|
     b.mode        = :rsync
-    b.files       = %w[ mirror state ]
-    b.destination = "evrinid-df3-1:/opt/var/backup/#{`hostname -s`}"
+    b.files       = %w[ state downloads ]
+    b.destination = "other-host-1:/opt/var/backup/#{`hostname -s`}"
     b.when        = "23:00"
   end
 
