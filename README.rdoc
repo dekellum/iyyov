@@ -1,6 +1,8 @@
 = Iyyov
 
+* http://github.com/dekellum/iyyov
 * http://en.wikipedia.org/wiki/Iyyov
+* http://gravitext.com/#vblog
 
 == Description
 
@@ -10,7 +12,7 @@ Down-to-earth job control and monitoring. Features include:
 * Ruby-based configuration
 * Gem packaged/Hashdot daemon based launching
 * Log rotation with daemon SIGHUP support
-* Fixed time scheduling/basic cron replacement
+* Fixed and periodic time job scheduling (basic cron replacement).
 
 == License
 
