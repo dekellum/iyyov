@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# iyyov    Startup script for Iyyov monitoring daemon
+#
+# chkconfig: 2345 88 12
+# description: Iyyov daemon
+# processname: iyyov-daemon
+# config: /opt/var/iyyov/jobs.rb
+
+. /etc/rc.d/init.d/functions
+
+prog="iyyov-daemon"
+version="1.0.1"
+daemon="/opt/jruby/gems/gems/iyyov-${version}-java/init/${prog}"
+
+user="david"
+rundir="/opt/var/iyyov"
+config="${rundir}/jobs.rb"
+pidfile="${rundir}/${prog}.pid"
+
+# PATH to jruby
+export PATH=/opt/bin:$PATH
+
+RETVAL=0
+
+start() {
+    [ -x "$daemon" ] || exit 5
+    [ -f "$config" ] || exit 6
+    [ -d "$rundir" ] || exit 7
+
+    echo -n $"Starting $prog: "
+    runuser -c "cd $rundir && $daemon $config" $user
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && success $"$prog startup" || failure $"$prog startup"
+    echo
+}
+
+status() {
+    if [ -f "$pidfile" ]; then
+        echo "Status $prog: running pid $(<$pidfile)"
+    else
+        echo "Status $prog: not running"
+    fi
+}
+
+reload() {
+    if [ -e "$pidfile" ]; then
+        touch $config
+    fi
+}
+
+stop() {
+    echo -n $"Shutting down $prog: "
+    killproc -p $pidfile $prog
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && success || failure
+    echo
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    restart)
+        stop
+        start
+        RETVAL=$?
+        ;;
+    condrestart)
+        [ -e $pidfile ] && restart
+        RETVAL=$?
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|reload|restart|condrestart}"
+        RETVAL=1
+esac
+
+exit $RETVAL
