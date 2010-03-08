@@ -22,7 +22,7 @@ require 'iyyov/log_rotator'
 module Iyyov
   include RJack
 
-  # A daemon isntance to start and monitor
+  # A daemon instance to start and monitor
   class Daemon
 
     # Name of this daemon. Must be unique in combination with any
@@ -231,7 +231,6 @@ module Iyyov
     end
 
     def find_gem_spec
-      #FIXME: Use Gem.clear_paths to rescan.
       @gem_spec ||= Gem.source_index.find_name( gem_name, version ).last
       unless @gem_spec
         raise( Gem::GemNotFoundException, "Missing gem #{gem_name} (#{version})" )
