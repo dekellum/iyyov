@@ -35,19 +35,24 @@ t.specify do |h|
                         [ 'hashdot-test-daemon', '>= 1.0.0'  ] ]
 end
 
-task :check_init_version do
+# Version/date consistency checks:
+
+task :chk_init_v do
   t.test_line_match( 'init/iyyov-daemon',
                       /^gem.+#{t.name}/, /= #{t.version}/ )
 end
-task :check_history_version do
+task :chk_rcd_v do
+  t.test_line_match( 'samples/init.d/iyyov', /^version=".+"/, /"#{t.version}"/ )
+end
+task :chk_hist_v do
   t.test_line_match( 'History.rdoc', /^==/, / #{t.version} / )
 end
-task :check_history_date do
+task :chk_hist_date do
   t.test_line_match( 'History.rdoc', /^==/, /\([0-9\-]+\)$/ )
 end
 
-task :gem  => [ :check_init_version, :check_history_version ]
-task :tag  => [ :check_init_version, :check_history_version, :check_history_date ]
-task :push => [                                              :check_history_date ]
+task :gem  => [ :chk_init_v, :chk_rcd_v, :chk_hist_v ]
+task :tag  => [ :chk_init_v, :chk_rcd_v, :chk_hist_v, :chk_hist_date ]
+task :push => [                                       :chk_hist_date ]
 
 t.define_tasks
