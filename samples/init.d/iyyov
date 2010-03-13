@@ -9,17 +9,26 @@
 
 . /etc/rc.d/init.d/functions
 
-prog="iyyov-daemon"
-version="1.0.1"
-daemon="/opt/jruby/gems/gems/iyyov-${version}-java/init/${prog}"
+# Gem home directory
+# Set to match system "jgem environment path"
+gem_home="/opt/jruby/gems"
 
-user="david"
+# (Exact) Gem version of iyyov to run
+version="1.0.1"
+
+# User to run the daemon as (should own rundir)
+user="iyyov"
+
+# Running directory (for jobs.rb config, log, and pid file)
 rundir="/opt/var/iyyov"
+
+# Add PATH to jruby if non-standard
+export PATH=/opt/bin:$PATH
+
+prog="iyyov-daemon"
+daemon="${gem_home}/gems/iyyov-${version}-java/init/${prog}"
 config="${rundir}/jobs.rb"
 pidfile="${rundir}/${prog}.pid"
-
-# PATH to jruby
-export PATH=/opt/bin:$PATH
 
 RETVAL=0
 
