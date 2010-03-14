@@ -33,7 +33,7 @@ configurations. Sample jobs.rb configuration:
 
     c.define_daemon do |d|
       d.name     = "hashdot-test-daemon"
-      d.version  = "~> 1.0.0"
+      d.version  = "~> 1.0"
       d.log_rotate do |l|
         l.max_size_mb = 256
       end

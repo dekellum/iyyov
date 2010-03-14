@@ -2,7 +2,7 @@ Iyyov.context do |c|
 
   c.define_daemon do |d|
     d.name     = "hashdot-test-daemon"
-    d.version  = "~> 1.0.0"
+    d.version  = "~> 1.0"
     d.stop_on_exit = true
     d.stop_delay = 2.0
     d.log_rotate
