@@ -13,6 +13,10 @@ lib/iyyov/log_rotator.rb
 lib/iyyov/scheduler.rb
 lib/iyyov/shutdown_handler.rb
 lib/iyyov/task.rb
+config/jobs.rb
+config/async.rb
+config/crontab
+config/init.d/iyyov
 test/setup.rb
 test/test_daemon.rb
 test/test_scheduler.rb
