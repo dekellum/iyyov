@@ -101,13 +101,6 @@ module Iyyov
     # Symbol (in STATES)
     attr_reader   :state
 
-    # Once do_first is called and provided a gem is found (gem version
-    # specified).
-    #
-    # Gem::Specification
-    # FIXME: May not want to expose this.
-    attr_reader   :gem_spec
-
     # States tracked
     STATES = [ :begin, :up, :failed, :stopped ]
 
