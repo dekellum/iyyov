@@ -44,15 +44,22 @@ end
 task :chk_rcd_v do
   t.test_line_match( 'config/init.d/iyyov', /^version=".+"/, /"#{t.version}"/ )
 end
+task :chk_cron_v do
+  t.test_line_match( 'config/crontab', /gems\/iyyov/,
+                     /iyyov-#{t.version}-java/ )
+end
 task :chk_hist_v do
   t.test_line_match( 'History.rdoc', /^==/, / #{t.version} / )
 end
+
+gem_tests = [ :chk_init_v, :chk_rcd_v, :chk_cron_v, :chk_hist_v  ]
+
 task :chk_hist_date do
   t.test_line_match( 'History.rdoc', /^==/, /\([0-9\-]+\)$/ )
 end
 
-task :gem  => [ :chk_init_v, :chk_rcd_v, :chk_hist_v ]
-task :tag  => [ :chk_init_v, :chk_rcd_v, :chk_hist_v, :chk_hist_date ]
-task :push => [                                       :chk_hist_date ]
+task :gem  => gem_tests
+task :tag  => gem_tests + [ :chk_hist_date ]
+task :push => [ :chk_hist_date ]
 
 t.define_tasks
