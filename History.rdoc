@@ -1,4 +1,4 @@
-=== 1.0.1 (TBD)
+=== 1.0.1 (2010-3-13)
 * Fix dependencies
 * Cleanup and add config examples to gem, including init.d and crontab
   examples.
