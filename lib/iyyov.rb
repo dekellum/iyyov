@@ -41,6 +41,10 @@ module Iyyov
     @context
   end
 
+  def self.set_test_context
+    @context = Context.new
+  end
+
   # Load root configuration files.
   def self.load_root_files( files )
     old_context = @context

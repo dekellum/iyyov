@@ -17,6 +17,9 @@ config/jobs.rb
 config/async.rb
 config/crontab
 config/init.d/iyyov
+test/jobs-bad.rb
+test/jobs-dupe.rb
 test/setup.rb
+test/test_context.rb
 test/test_daemon.rb
 test/test_scheduler.rb
