@@ -50,6 +50,7 @@ class TestContext < MiniTest::Unit::TestCase
   def test_load_samples
     Dir[ File.join( TESTDIR, '..', 'config', '*.rb' ) ].each do |conf|
       Iyyov.context { |c| c.load_file( conf ) }
+      Iyyov.context.shutdown
       Iyyov.set_test_context
       pass
     end
