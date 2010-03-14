@@ -42,7 +42,7 @@ task :chk_init_v do
                       /^gem.+#{t.name}/, /= #{t.version}/ )
 end
 task :chk_rcd_v do
-  t.test_line_match( 'samples/init.d/iyyov', /^version=".+"/, /"#{t.version}"/ )
+  t.test_line_match( 'config/init.d/iyyov', /^version=".+"/, /"#{t.version}"/ )
 end
 task :chk_hist_v do
   t.test_line_match( 'History.rdoc', /^==/, / #{t.version} / )
