@@ -6,13 +6,77 @@
 
 == Description
 
-Down-to-earth job control and monitoring. Features include:
+Down-to-earth job control and monitoring.
 
-* Runs on JRuby (no fork)
-* Ruby-based configuration
-* Gem packaged/Hashdot daemon based launching
+=== Features
+
+* Runs on JRuby (no fork or native code extensions)
+* Powerful ruby-based configuration inspired by {God}[http://god.rubyforge.org]
+* Simplified gem packaged daemon launching and monitoring (via Hashdot, others)
 * Log rotation with daemon SIGHUP support
-* Fixed and periodic time job scheduling (basic cron replacement).
+* Fixed and periodic time job scheduling (basic cron replacement)
+  * Threaded asynchronous support with mutual exclusion for long
+    running scheduled jobs
+* Configuration file monitoring and reload support
+  * Automatic daemon restart on upgrade or other changes
+
+== Synopsis
+
+Iyyov can be tested in the foreground with (-d)ebug logging:
+
+  % iyyov-fg -d jobs.rb
+
+See gem or source config/ directory for sample/runnable
+configurations. Sample jobs.rb configuration:
+
+  Iyyov.context do |c|
+
+    c.define_daemon do |d|
+      d.name     = "hashdot-test-daemon"
+      d.version  = "~> 1.0.0"
+      d.log_rotate do |l|
+        l.max_size_mb = 256
+      end
+    end
+
+    c.schedule_at( :name => "hello", :period => 3.0 ) do
+      puts "hello every 3.0 seconds"
+    end
+
+    c.schedule_at( :name => "fixed",
+                   :fixed_times => %w[ 00:01 12:02 ] ) do
+      puts "Fixed time task"
+    end
+
+  end
+
+== Daemon support
+
+The simple form of the define_daemon creates an Iyyov::Daemon
+based on the following conventions:
+
+* The required name by default is used as a gem name as well as init
+  script name.
+* Most all set attributes may be lambda's.
+* If a version is specified, the default Daemon.exe_path will be an
+  init script with the same name and provided by the same named gem
+  and highest matching version.
+* In any case, the Daemon.exe_path should itself demonize and create
+  a pid in order to be monitored.
+  {Hashdot}[http://hashdot.sourceforge.net/] provides one reliable
+  means of achieving this. Its could also be achieved via a bash
+  script.
+
+== Setup
+
+Besides creating one or many jobs.rb scripts, you will want to arrange
+for iyyov to be started on system boot. There are several ways to
+achieve this:
+
+* UNIX init.d script (a CentOS/Fedora version is provided in gem or source
+  config/init.d directory)
+* inittab or upstart (which also supports monitoring iyyov/restarting itself)
+* Crontab (an example is provided at gem or source config/crontab)
 
 == License
 

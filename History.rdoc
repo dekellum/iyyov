@@ -1,4 +1,10 @@
 === 1.0.1 (TBD)
+* Fix dependencies
+* Cleanup and add config examples to gem, including init.d and crontab
+  examples.
+* Proper README.rdoc
+* Add context file load error handling and example config tests.
+* Improve error handling with tasks (log, :stop on StandardError)
 
 === 1.0.0 (2010-3-7)
 * Initial release.
