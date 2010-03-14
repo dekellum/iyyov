@@ -77,7 +77,6 @@ module Iyyov
 
       yield self if block_given?
 
-      #FIXME: Validate log directory?
       nil
     end
 

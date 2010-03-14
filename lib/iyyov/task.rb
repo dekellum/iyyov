@@ -67,7 +67,10 @@ module Iyyov
 
       @block = block
 
-      #FIXME: Validation?
+      unless period || fixed_times
+        raise( SetupError,
+               "Task #{ opts.inspect } needs one of period or fixed_times" )
+      end
 
       @log = SLF4J[ [ SLF4J[ self.class ].name, name ].compact.join( '.' ) ]
 
