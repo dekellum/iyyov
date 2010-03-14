@@ -125,9 +125,13 @@ module Iyyov
 
     def run_direct
       @log.debug "Running."
-      rc = ( @block.call if @block )
-      #FIXME: Errors to handle?
-      filter( rc )
+      begin
+        rc = ( @block.call if @block )
+        filter( rc )
+      rescue StandardError => e
+        @log.error( "Handled and stopped with: ", e )
+        :stop
+      end
     end
 
     def filter( rc )
