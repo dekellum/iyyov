@@ -13,9 +13,10 @@ lib/iyyov/log_rotator.rb
 lib/iyyov/scheduler.rb
 lib/iyyov/shutdown_handler.rb
 lib/iyyov/task.rb
-config/jobs.rb
 config/async.rb
 config/crontab
+config/jobs.rb
+config/load-all.rb
 config/init.d/iyyov
 test/jobs-bad.rb
 test/jobs-dupe.rb
