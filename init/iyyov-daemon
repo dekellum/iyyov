@@ -24,7 +24,7 @@
 
 require 'rubygems'
 
-gem( "iyyov", "= 1.0.1" )
+gem( "iyyov", "= 1.0.2" )
 
 require 'rjack-logback'
 RJack::Logback.config_console( :full => true, :thread => true )
