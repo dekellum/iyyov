@@ -62,10 +62,9 @@ based on the following conventions:
   init script with the same name and provided by the same named gem
   and highest matching version.
 * In any case, the Daemon.exe_path should itself demonize and create
-  a pid in order to be monitored.
-  {Hashdot}[http://hashdot.sourceforge.net/] provides one reliable
-  means of achieving this. Its could also be achieved via a bash
-  script.
+  a PID file in order to be monitored.
+  {Hashdot}[http://hashdot.sourceforge.net/] provides reliable
+  means of achieving this.
 
 == Setup
 
@@ -75,8 +74,11 @@ achieve this:
 
 * UNIX init.d script (a CentOS/Fedora version is provided in gem or source
   config/init.d directory)
-* inittab or upstart (which also supports monitoring iyyov/restarting itself)
+* inittab or upstart (which also supports monitoring/restarting iyyov itself)
 * Crontab (an example is provided at gem or source config/crontab)
+
+Iyyov itself contains a Hashdot annotated init/iyyov-daemon script
+used by the above provided examples.
 
 == License
 
