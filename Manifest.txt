@@ -17,6 +17,7 @@ config/async.rb
 config/crontab
 config/jobs.rb
 config/load-all.rb
+config/host-based.rb
 config/init.d/iyyov
 test/jobs-bad.rb
 test/jobs-dupe.rb
