@@ -1,3 +1,6 @@
+=== 1.0.2 (2010-3-14)
+* Include a host-based.rb selection config example.
+* Futher README.rdoc improvements.
 * Fix test/example version specifiers for hashdot-test-daemon "~> 1.0"
   to account for 1.0.0, 1.1.0.
 
