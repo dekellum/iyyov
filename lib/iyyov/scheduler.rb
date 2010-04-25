@@ -30,7 +30,7 @@ module Iyyov
       @queue = Java::java.util.PriorityQueue.new( 67, TimeComp.new )
       @lock = Mutex.new
       @shutdown_handler = nil
-      @log = SLF4J[ self.class ]
+      @log = RJack::SLF4J[ self.class ]
     end
 
     def add( t, now = Time.now )
