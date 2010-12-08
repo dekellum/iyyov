@@ -1,4 +1,6 @@
 === 1.1.0 (TBD)
+* Upgrade to slf4j ~> 1.6.1, logback ~> 1.0.0
+* Upgrade (dev dependencies) minitest < 2.1, hashdot-test-daemon ~> 1.2
 
 === 1.0.2 (2010-3-14)
 * Include a host-based.rb selection config example.
