@@ -68,7 +68,7 @@ module Iyyov
 
     def initialize( log = nil )
       @log = log
-      max_size_mb = 256
+      self.max_size_mb = 256
       @count = 3
       @gzip = true
       @signal = "HUP"

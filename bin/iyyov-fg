@@ -24,8 +24,8 @@ $LOAD_PATH.unshift File.join( File.dirname(__FILE__), "..", "lib" )
 require 'rubygems'
 require 'rjack-logback'
 
-Logback.config_console( :thread => true, :lwidth => 35,
-                        :level => Logback::INFO )
+RJack::Logback.config_console( :thread => true, :lwidth => 35,
+                               :level => RJack::Logback::INFO )
 
 require 'optparse'
 require 'iyyov'
@@ -39,7 +39,7 @@ Options:
 END
 
   opts.on( "-d", "--debug", "Enable debug logging" ) do
-    Logback.root.level = Logback::DEBUG
+    RJack::Logback.root.level = Logback::DEBUG
   end
 
   opts.on( "-v", "--version", "Show version and exit" ) do

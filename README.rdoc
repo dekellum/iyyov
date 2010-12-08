@@ -55,8 +55,8 @@ configurations. Sample jobs.rb configuration:
 The simple form of the define_daemon creates an Iyyov::Daemon
 based on the following conventions:
 
-* The required name by default is used as a gem name as well as init
-  script name.
+* The required name is used as the default gem name as well and
+  default init script name.
 * Most all set attributes may be lambda's.
 * If a version is specified, the default Daemon.exe_path will be an
   init script with the same name and provided by the same named gem
@@ -77,8 +77,8 @@ achieve this:
 * inittab or upstart (which also supports monitoring/restarting iyyov itself)
 * Crontab (an example is provided at gem or source config/crontab)
 
-Iyyov itself contains a Hashdot annotated init/iyyov-daemon script
-used by the above provided examples.
+Iyyov itself contains a Hashdot annotated init/iyyov script used by
+the above provided examples.
 
 == License
 

@@ -9,7 +9,7 @@ config/host-based.rb
 config/jobs.rb
 config/load-all.rb
 config/init.d/iyyov
-init/iyyov-daemon
+init/iyyov
 lib/iyyov/base.rb
 lib/iyyov.rb
 lib/iyyov/context.rb

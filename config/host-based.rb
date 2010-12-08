@@ -1,7 +1,7 @@
 Iyyov.context do |c|
 
   hostname = `hostname -s`.strip
-  SLF4J[ File.basename( __FILE__ ) ].info( "Setup services for [#{hostname}]." )
+  RJack::SLF4J[ File.basename( __FILE__ ) ].info( "Setup services for [#{hostname}]." )
 
   case hostname
 
