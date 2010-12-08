@@ -20,10 +20,10 @@ require 'fileutils'
 require 'iyyov/log_rotator'
 
 module Iyyov
-  include RJack
 
   # A daemon instance to start and monitor
   class Daemon
+    include RJack
 
     # Name of this daemon. Must be unique in combination with any
     # specified instance.

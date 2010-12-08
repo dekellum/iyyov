@@ -28,11 +28,11 @@ t = RJack::TarPit.new( 'iyyov', Iyyov::VERSION, :java_platform )
 t.specify do |h|
   h.developer( 'David Kellum', 'dek-oss@gravitext.com' )
   h.testlib = :minitest
-  h.extra_deps     += [ [ 'rjack-slf4j',         '~> 1.5.11' ],
-                        [ 'rjack-logback',       '~> 0.9.18' ],
-                        [ 'logrotate',           '=  1.2.1'  ] ]
-  h.extra_dev_deps += [ [ 'minitest',            '~> 1.5.0'  ],
-                        [ 'hashdot-test-daemon', '~> 1.0'    ] ]
+  h.extra_deps     += [ [ 'rjack-slf4j',         '~> 1.6.1' ],
+                        [ 'rjack-logback',       '~> 1.0.0' ],
+                        [ 'logrotate',           '=  1.2.1' ] ]
+  h.extra_dev_deps += [ [ 'minitest',            '>= 1.5.0', '< 2.1' ],
+                        [ 'hashdot-test-daemon', '~> 1.2'   ] ]
 end
 
 # Version/date consistency checks:

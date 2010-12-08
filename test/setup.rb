@@ -33,7 +33,7 @@ end
 
 time_it( "logback" ) do
   require 'rjack-logback'
-  RJack::Logback.config_console( :level => Logback::INFO, :stderr => true )
+  RJack::Logback.config_console( :level => RJack::Logback::INFO, :stderr => true )
 end
 
 time_it( "test/unit" ) do

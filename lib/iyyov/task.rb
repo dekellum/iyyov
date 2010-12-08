@@ -22,6 +22,7 @@ module Iyyov
 
   # A task to be scheduled and run.
   class Task
+    include RJack
 
     # Regular interval between subsequent executions in seconds.
     #
