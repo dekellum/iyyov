@@ -38,7 +38,7 @@ end
 # Version/date consistency checks:
 
 task :chk_init_v do
-  t.test_line_match( 'init/iyyov-daemon',
+  t.test_line_match( 'init/iyyov',
                       /^gem.+#{t.name}/, /= #{t.version}/ )
 end
 task :chk_rcd_v do

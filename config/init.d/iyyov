@@ -4,7 +4,7 @@
 #
 # chkconfig: 2345 88 12
 # description: Iyyov monitoring daemon
-# processname: iyyov-daemon
+# processname: iyyov
 # config: /opt/var/iyyov/jobs.rb
 
 . /etc/rc.d/init.d/functions
@@ -25,7 +25,7 @@ rundir="/opt/var/iyyov"
 # Add PATH to jruby if non-standard
 export PATH=/opt/bin:$PATH
 
-prog="iyyov-daemon"
+prog="iyyov"
 daemon="${gem_home}/gems/iyyov-${version}-java/init/${prog}"
 config="${rundir}/jobs.rb"
 pidfile="${rundir}/${prog}.pid"

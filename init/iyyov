@@ -1,8 +1,8 @@
 #!/usr/bin/env jruby
 #-*- ruby -*-
 #. hashdot.profile         += daemon
-#. hashdot.pid_file         = ./iyyov-daemon.pid
-#. hashdot.io_redirect.file = ./iyyov-daemon.log
+#. hashdot.pid_file         = ./iyyov.pid
+#. hashdot.io_redirect.file = ./iyyov.log
 #. hashdot.vm.options += -Xmx64m
 #. hashdot.vm.options += -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled
 
