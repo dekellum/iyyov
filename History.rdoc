@@ -1,4 +1,7 @@
 === 1.1.0 (TBD)
+* Fix LogRotator.max_size initialized default. (issues/1)
+* Change name of daemon to plain 'iyyov' (in keeping with standard
+  daemon naming.)
 * Upgrade to slf4j ~> 1.6.1, logback ~> 1.0.0
 * Upgrade (dev dependencies) minitest < 2.1, hashdot-test-daemon ~> 1.2
 
