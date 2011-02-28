@@ -39,7 +39,7 @@ Options:
 END
 
   opts.on( "-d", "--debug", "Enable debug logging" ) do
-    RJack::Logback.root.level = Logback::DEBUG
+    RJack::Logback.root.level = RJack::Logback::DEBUG
   end
 
   opts.on( "-v", "--version", "Show version and exit" ) do
