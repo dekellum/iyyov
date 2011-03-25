@@ -101,6 +101,9 @@ module Iyyov
     # Symbol (in STATES)
     attr_reader   :state
 
+    # SLF4J logger
+    attr_reader   :log
+
     # States tracked
     STATES = [ :begin, :up, :failed, :stopped ]
 
