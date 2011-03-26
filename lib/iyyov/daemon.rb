@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2010 David Kellum
+# Copyright (c) 2010-2011 David Kellum
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you
 # may not use this file except in compliance with the License.  You
@@ -100,6 +100,9 @@ module Iyyov
     #
     # Symbol (in STATES)
     attr_reader   :state
+
+    # SLF4J logger
+    attr_reader   :log
 
     # States tracked
     STATES = [ :begin, :up, :failed, :stopped ]
