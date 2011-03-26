@@ -1,3 +1,5 @@
+=== 1.1.1 (TBD)
+
 === 1.1.0 (2010-12-7)
 * Fix LogRotator.max_size initialized default. (issues/1)
 * Change name of daemon to plain 'iyyov' (in keeping with standard
