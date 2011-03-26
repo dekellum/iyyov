@@ -14,7 +14,7 @@ t.specify do |h|
   h.developer( 'David Kellum', 'dek-oss@gravitext.com' )
   h.testlib = :minitest
   h.extra_deps     += [ [ 'rjack-slf4j',         '~> 1.6.1' ],
-                        [ 'rjack-logback',       '~> 1.0.0' ],
+                        [ 'rjack-logback',       '~> 1.1.1' ],
                         [ 'logrotate',           '=  1.2.1' ] ]
   h.extra_dev_deps += [ [ 'minitest',            '>= 1.5.0', '< 2.1' ],
                         [ 'hashdot-test-daemon', '~> 1.2'   ] ]
