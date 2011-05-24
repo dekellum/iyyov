@@ -55,6 +55,9 @@ module Iyyov
     # Once schedule succeeds, the absolute next time to execute.
     attr_reader :next_time
 
+    # SLF4J logger
+    attr_reader   :log
+
     # New task given options matching accessors and block containing
     # work.
     def initialize( opts = {}, &block )
