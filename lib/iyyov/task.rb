@@ -32,7 +32,7 @@ module Iyyov
     # One or more fixed time values in 24hour format, local
     # timezone, i.e: [ "11:30", "23:30" ]
     #
-    # ~to_a[String] (default: nil, use period)
+    # Array(String) (default: nil, use period)
     attr_accessor :fixed_times
 
     # Array or range for days of week in which fixed_times apply. Days
@@ -169,7 +169,7 @@ module Iyyov
       ntime = nil
       while ntime.nil? && day <= last
         if fixed_days.include?( day.wday )
-          fixed_times.to_a.each do |ft|
+          Array( fixed_times ).each do |ft|
             ft = time_on_date( day, Time.parse( ft, now ) )
             ntime = ft if ( ( ft > now ) && ( ntime.nil? || ft < ntime ) )
           end
