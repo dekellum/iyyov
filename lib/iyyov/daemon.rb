@@ -227,7 +227,12 @@ module Iyyov
     end
 
     def find_gem_spec
-      @gem_spec ||= Gem.source_index.find_name( gem_name, version ).last
+      @gem_spec ||=
+        if Gem::Specification.respond_to?( :find_by_name )
+          Gem::Specification.find_by_name( gem_name, version )
+        else
+          Gem.source_index.find_name( gem_name, version ).last
+        end
       unless @gem_spec
         raise( Gem::GemNotFoundException, "Missing gem #{gem_name} (#{version})" )
       end
@@ -250,7 +255,7 @@ module Iyyov
 
       @state = :up
       true
-    rescue Gem::GemNotFoundException, DaemonFailed, Errno::ENOENT => e
+    rescue Gem::LoadError, Gem::GemNotFoundException, DaemonFailed, Errno::ENOENT => e
       @log.error( e.to_s )
       @state = :failed
       false
