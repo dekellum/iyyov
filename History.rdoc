@@ -1,3 +1,5 @@
+=== 1.1.2 (TBD)
+
 === 1.1.1 (2011-3-26)
 * Fix one more bare Logback reference for iyyov-fg -d
 * Expose Daemon.log, for extensions.
