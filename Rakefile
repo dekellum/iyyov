@@ -3,7 +3,7 @@
 $LOAD_PATH << './lib'
 
 require 'rubygems'
-gem     'rjack-tarpit', '~> 1.3.0'
+gem     'rjack-tarpit', '~> 1.3.3'
 require 'rjack-tarpit'
 
 require 'iyyov/base'
@@ -16,7 +16,7 @@ t.specify do |h|
   h.extra_deps     += [ [ 'rjack-slf4j',         '~> 1.6.1' ],
                         [ 'rjack-logback',       '~> 1.1.1' ],
                         [ 'logrotate',           '=  1.2.1' ] ]
-  h.extra_dev_deps += [ [ 'minitest',            '>= 1.5.0', '< 2.1' ],
+  h.extra_dev_deps += [ [ 'minitest',            '~> 2.2'   ],
                         [ 'hashdot-test-daemon', '~> 1.2'   ] ]
 end
 
