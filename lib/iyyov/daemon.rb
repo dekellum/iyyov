@@ -236,7 +236,7 @@ module Iyyov
 
     def start
       epath = File.expand_path( exe_path )
-      eargs = args.to_a.map { |a| a.to_s.strip }.compact
+      eargs = args.map { |a| a.to_s.strip }.compact
       aversion = @gem_spec && @gem_spec.version
       @log.info { ( [ "starting", aversion || epath ] + eargs ).join(' ') }
 
@@ -260,7 +260,7 @@ module Iyyov
     # running instance.
     def exec_key
       keys = [ run_dir, exe_path ].map { |p| File.expand_path( p ) }
-      keys += args.to_a.map { |a| a.to_s.strip }.compact
+      keys += args.map { |a| a.to_s.strip }.compact
       keys.compact
     end
 
