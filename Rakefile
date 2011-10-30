@@ -3,7 +3,7 @@
 $LOAD_PATH << './lib'
 
 require 'rubygems'
-gem     'rjack-tarpit', '~> 1.3.3'
+gem     'rjack-tarpit', '~> 1.4'
 require 'rjack-tarpit'
 
 require 'iyyov/base'
