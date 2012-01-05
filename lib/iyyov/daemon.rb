@@ -264,8 +264,16 @@ module Iyyov
     # Return array suitable for comparing this daemon with prior
     # running instance.
     def exec_key
-      keys = [ run_dir, exe_path ].map { |p| File.expand_path( p ) }
-      keys += args.map { |a| a.to_s.strip }.compact
+      epath = begin
+                exe_path
+              rescue Gem::LoadError, Gem::GemNotFoundException => e
+                @log.warn( e.to_s )
+                # Use a bogus, unique path instead
+                "/tmp/gem-not-found/#{ Time.now.usec }/#{ rand( 2**31 ) }"
+              end
+
+      keys = [ run_dir, epath ].map { |p| File.expand_path( p ) }
+      keys += args.map { |a| a.to_s.strip }
       keys.compact
     end
 
