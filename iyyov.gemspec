@@ -6,7 +6,7 @@ require 'rjack-tarpit/spec'
 RJack::TarPit.specify do |s|
   require 'iyyov/base'
 
-  s.version  = Iyyov::VERSION
+  s.version = Iyyov::VERSION
 
   s.add_developer( 'David Kellum', 'dek-oss@gravitext.com' )
 
