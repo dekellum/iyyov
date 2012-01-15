@@ -58,10 +58,13 @@ class TestScheduler < MiniTest::Unit::TestCase
     s = Scheduler.new
     s.on_exit { flunk "Shouldn't make it here" }
     counter = 0
-    tk = Task.new( :name => "test_shutdown", :period => 0.001 ) do
+    tk = Task.new( :name => "test_shutdown", :period => 0.001 ) do |t|
       counter += 1
       assert( counter <= 2 )
-      :shutdown unless counter < 2
+      unless counter < 2
+        t.log.info "Shutting it down now"
+        :shutdown
+      end
     end
     s.add( tk )
     s.add( Task.new( :period => 5.0 ) { flunk "nor here" } )
