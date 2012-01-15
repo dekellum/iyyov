@@ -133,7 +133,7 @@ module Iyyov
     def run_direct
       @log.debug "Running."
       begin
-        rc = ( @block.call if @block )
+        rc = ( @block.call( self ) if @block )
         filter( rc )
       rescue StandardError => e
         @log.error( "Handled and stopped with: ", e )
