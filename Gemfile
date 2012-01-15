@@ -2,4 +2,4 @@
 
 source :rubygems
 
-gemspec
+gemspec :name => 'iyyov'
