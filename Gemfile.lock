@@ -10,7 +10,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     bouncy-castle-java (1.5.0146.1)
-    hashdot-test-daemon (1.2.2-java)
+    hashdot-test-daemon (1.2.3-java)
       rjack-logback (~> 1.1)
       rjack-slf4j (~> 1.6.1)
     jruby-openssl (0.7.6.1)
