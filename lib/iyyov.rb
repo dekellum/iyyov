@@ -57,11 +57,16 @@ module Iyyov
 
     if old_context
       if all_success
-        # Stop old daemons that are no longer in the newly configured
-        # context, or who's exec_key has changed
+        # Stop old daemons that are either:
+        # - no longer in the newly configured context, OR:
+        # - with exec_key changed AND a passing pre_check
         old_context.daemons.each do |name,odaemon|
           ndaemon = @context.daemons[name]
-          odaemon.stop unless ndaemon && ndaemon.exec_key == odaemon.exec_key
+          if ( ndaemon.nil? ||
+               ( ndaemon.pre_check &&
+                 ( ndaemon.exec_key != odaemon.exec_key ) ) )
+            odaemon.stop
+          end
         end
       else
         @context = old_context
