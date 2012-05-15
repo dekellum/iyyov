@@ -56,6 +56,8 @@ module Iyyov
     attr_reader   :daemons
 
     def initialize
+      super
+
       @base_dir     = "/opt/var"
       @make_run_dir = true
       @stop_on_exit = false
