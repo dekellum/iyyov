@@ -261,6 +261,19 @@ module Iyyov
       false
     end
 
+    # Return true if passes initial checks for start. This includes
+    # gem availability and/or if the exe_path is executable,
+    # i.e. everything that can be checked *before* starting.
+    def pre_check
+      epath = File.expand_path( exe_path )
+      is_exec = File.executable?( epath )
+      @log.warn( "#{epath} is not executable" ) unless is_exec
+      is_exec
+    rescue Gem::LoadError, Gem::GemNotFoundException, Errno::ENOENT => e
+      @log.warn( e.to_s )
+      false
+    end
+
     # Return array suitable for comparing this daemon with prior
     # running instance.
     def exec_key
