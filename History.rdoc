@@ -1,10 +1,15 @@
 === 1.1.4 (TBD)
 * Upgrade/broaden to slf4j [1.6.5,1.8), logback ~> 1.2
+* Only stop old daemons when either (a) they are no longer in the
+  newly configured context, or (b) with exec_key changed and a passing
+  pre_check. This avoids an install failure from terminating a
+  functional (older) version.
+* Call super in Context.initialize, for better support of late mixins.
 
 === 1.1.3 (2012-1-15)
 * Add task on call to block for log access, etc.
 * Fix handling of Gem::LoadError on reload of jobs.rb extended with a
-  daemon who's gem is not currently installed. Previously this was
+  daemon who's gem is not currently installed. Previously this was a
   fatal error.
 * Upgrade to tarpit ~> 2.0, bundler Gemfile, gemspec (build)
 
