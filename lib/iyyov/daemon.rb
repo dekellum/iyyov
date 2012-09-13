@@ -269,7 +269,7 @@ module Iyyov
       is_exec = File.executable?( epath )
       @log.warn( "#{epath} is not executable" ) unless is_exec
       is_exec
-    rescue Gem::LoadError, Gem::GemNotFoundException, Errno:ENOENT => e
+    rescue Gem::LoadError, Gem::GemNotFoundException, Errno::ENOENT => e
       @log.warn( e.to_s )
       false
     end
