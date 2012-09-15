@@ -1,4 +1,4 @@
-=== 1.1.4 (TBD)
+=== 1.1.4 (2012-9-15)
 * Upgrade/broaden to slf4j [1.6.5,1.8), logback ~> 1.2
 * Only stop old daemons when either (a) they are no longer in the
   newly configured context, or (b) with exec_key changed and a passing
