@@ -18,6 +18,7 @@ require 'rjack-slf4j'
 require 'fileutils'
 
 require 'iyyov/log_rotator'
+require 'iyyov/foreground'
 
 module Iyyov
 
@@ -47,6 +48,11 @@ module Iyyov
     #
     # Proc,Array[~to_s] (default: [])
     attr_writer   :args
+
+    # Whether this command runs in the foreground, thus requiring daemonization
+    #
+    # Boolean (default: false)
+    attr_writer   :foreground
 
     # Base directory under which run directories are found
     #
@@ -126,6 +132,7 @@ module Iyyov
       @make_run_dir = @context.make_run_dir
       @stop_on_exit = @context.stop_on_exit
       @stop_delay   = @context.stop_delay
+      @foreground   = false
 
       @pid_file     = method :default_pid_file
       @gem_name     = method :name
@@ -250,7 +257,11 @@ module Iyyov
       end
 
       Dir.chdir( run_dir ) do
-        system( epath, *eargs ) or raise( DaemonFailed, "Start failed with #{$?}" )
+        if @foreground
+          Foreground.new( self, epath, eargs ).start
+        else
+          system( epath, *eargs ) or raise( DaemonFailed, "Start failed with #{$?}" )
+        end
       end
 
       @state = :up

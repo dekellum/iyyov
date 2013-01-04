@@ -54,6 +54,7 @@ class TestDaemon < MiniTest::Unit::TestCase
   def test_exe_path
     d = Daemon.new( @context ) { |h| h.name = "hashdot-test-daemon" }
     assert File.executable?( d.exe_path )
+    assert_match( /init\/hashdot-test-daemon$/, d.exe_path )
     @log.info d.exe_path
   end
 
@@ -84,6 +85,40 @@ class TestDaemon < MiniTest::Unit::TestCase
       h.version = "= 6.6.6"
     end
     assert_equal( :stop, d.do_first( nil ) )
+  end
+
+  def test_exe_path_setter
+    d = Daemon.new( @context ) do |h|
+      h.name = 'foo'
+      h.exe_path = "/tmp/foo"
+    end
+    assert_equal( '/tmp/foo', d.exe_path )
+  end
+
+  def test_foreground
+    d = Daemon.new( @context ) do |h|
+      h.name = 'sleep'
+      h.run_dir = @tdir
+      h.exe_path = '/bin/bash'
+      h.args = [ '-c', 'sleep 600' ]
+      h.foreground = true
+    end
+
+    # If this hangs then +foreground+ is broken.
+    d.start
+
+    assert( d.alive? )
+    assert( File.exist?( d.pid_file ),
+            "Foreground process should create a pid file at #{d.pid_file}" )
+
+    d.stop
+
+    assert( !d.alive? )
+    assert( !File.exist?( d.pid_file ),
+            "Stopped process should cleanup pid file" )
+  ensure
+    pid_file = File.join( @tdir, 'sleep.pid' )
+    File.delete( pid_file ) if File.exist?( pid_file )
   end
 
 end
