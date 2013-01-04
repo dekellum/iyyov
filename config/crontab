@@ -1,2 +1,2 @@
 # PATH=/opt/bin
-*/1 * * * * cd /opt/var/iyyov && /opt/jruby/gems/gems/iyyov-1.1.3-java/init/iyyov jobs.rb
+*/1 * * * * cd /opt/var/iyyov && /opt/jruby/gems/gems/iyyov-1.2.0-java/init/iyyov jobs.rb
