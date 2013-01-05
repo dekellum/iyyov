@@ -26,9 +26,11 @@ module Iyyov
     # Start the daemon process
     def exec_command( command, args )
       @process = ChildProcess.build( command, *args )
-      
-      # TODO: Stdout/Stderr redirection
-      
+
+      # Stdout/Stderr redirection to the log file
+      stream = File.open( default_log, 'a' )
+      @process.io.stdout = @process.io.stderr = stream
+
       @process.detach
       @process.start
 

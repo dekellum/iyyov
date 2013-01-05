@@ -119,6 +119,7 @@ class TestDaemon < MiniTest::Unit::TestCase
   ensure
     pid_file = File.join( @tdir, 'sleep.pid' )
     File.delete( pid_file ) if File.exist?( pid_file )
+    File.delete( d.default_log ) if File.exist?( d.default_log )
   end
 
   def test_foreground_process_restart
@@ -136,6 +137,26 @@ class TestDaemon < MiniTest::Unit::TestCase
   ensure
     pid_file = File.join( @tdir, 'echo.pid' )
     File.delete( pid_file ) if File.exist?( pid_file )
+    File.delete( d.default_log ) if File.exist?( d.default_log )
+  end
+
+  def test_foreground_process_log
+    d = ForegroundProcess.new( @context ) do |h|
+      h.name = 'echo'
+      h.run_dir = @tdir
+      h.exe_path = '/bin/bash'
+      h.args = [ '-c', 'echo foo' ]
+    end
+
+    d.start
+    d.stop
+
+    logged = File.read( d.default_log )
+    assert_equal( "foo\n", logged )
+  ensure
+    pid_file = File.join( @tdir, 'echo.pid' )
+    File.delete( pid_file ) if File.exist?( pid_file )
+    File.delete( d.default_log ) if File.exist?( d.default_log )
   end
 
 end
