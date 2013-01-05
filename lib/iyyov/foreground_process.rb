@@ -21,30 +21,34 @@ module Iyyov
 
   # Support external processes that run in the foreground as daemons (daemonized
   # with help from Iyyov).
-  class ForegroundDaemon
-
-    def initialize( daemon, exe_path, exe_args )
-      @daemon = daemon
-      @exe_path = exe_path
-      @exe_args = exe_args
-    end
+  class ForegroundProcess < Daemon
 
     # Start the daemon process
-    def start
-      process_args = ([ @exe_path ] + @exe_args).flatten.map(&:to_s)
-
-      @process = ChildProcess.build(*process_args)
+    def exec_command( command, args )
+      @process = ChildProcess.build( command, *args )
+      
+      # TODO: Stdout/Stderr redirection
+      
       @process.detach
       @process.start
 
       # Write pid file
-      File.open(@daemon.pid_file, 'w') {|f| f.write(@process.pid) }
+      File.open( pid_file, 'w' ) {|f| f.write( @process.pid ) }
+    end
 
-      @daemon.instance_variable_set(:@process, @process)
-      def @daemon.stop
-        @process.stop
-        File.delete( pid_file )
+    def alive?( pid = pid )
+      if @process && @process.pid == pid
+        @process.alive?
+      else
+        super( pid )
       end
+    end
+
+    def stop
+      @process.stop
+      File.delete( pid_file )
+      @status = :stopped
+      true
     end
 
   end

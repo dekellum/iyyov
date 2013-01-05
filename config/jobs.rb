@@ -12,11 +12,10 @@ Iyyov.context do |c|
     end
   end
 
-  c.define_daemon do |d|
-    d.name       = "foreground-daemon"
-    d.foreground = true
-    d.exe_path   = '/bin/bash'
-    d.args       = [ '-c', 'cat /dev/urandom  > /dev/null' ]
+  c.define_foreground_process do |p|
+    p.name       = "foreground-daemon"
+    p.exe_path   = '/bin/bash'
+    p.args       = [ '-c', 'cat /dev/urandom  > /dev/null' ]
   end
 
   c.schedule_at( :name => "hello", :period => 3.0 ) do

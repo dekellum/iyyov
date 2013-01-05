@@ -21,6 +21,7 @@ require 'iyyov/errors'
 require 'iyyov/task'
 require 'iyyov/scheduler'
 require 'iyyov/daemon'
+require 'iyyov/foreground_process'
 
 module Iyyov
 
@@ -120,6 +121,16 @@ module Iyyov
       if @daemons.has_key?( d.full_name )
         raise( SetupError,
                "Can't define daemon with duplicate full_name = #{d.full_name}" )
+      end
+      @daemons[ d.full_name ] = d
+      nil
+    end
+
+    def define_foreground_process( &block )
+      d = ForegroundProcess.new( self, &block )
+      if @daemons.has_key?( d.full_name )
+        raise( SetupError,
+               "Can't define foreground process with duplicate full_name = #{d.full_name}" )
       end
       @daemons[ d.full_name ] = d
       nil

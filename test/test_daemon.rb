@@ -95,13 +95,12 @@ class TestDaemon < MiniTest::Unit::TestCase
     assert_equal( '/tmp/foo', d.exe_path )
   end
 
-  def test_foreground
-    d = Daemon.new( @context ) do |h|
+  def test_foreground_process
+    d = ForegroundProcess.new( @context ) do |h|
       h.name = 'sleep'
       h.run_dir = @tdir
       h.exe_path = '/bin/bash'
       h.args = [ '-c', 'sleep 600' ]
-      h.foreground = true
     end
 
     # If this hangs then +foreground+ is broken.
@@ -110,6 +109,7 @@ class TestDaemon < MiniTest::Unit::TestCase
     assert( d.alive? )
     assert( File.exist?( d.pid_file ),
             "Foreground process should create a pid file at #{d.pid_file}" )
+    assert_equal( :up, d.start_check )
 
     d.stop
 
@@ -118,6 +118,23 @@ class TestDaemon < MiniTest::Unit::TestCase
             "Stopped process should cleanup pid file" )
   ensure
     pid_file = File.join( @tdir, 'sleep.pid' )
+    File.delete( pid_file ) if File.exist?( pid_file )
+  end
+
+  def test_foreground_process_restart
+    d = ForegroundProcess.new( @context ) do |h|
+      h.name = 'echo'
+      h.run_dir = @tdir
+      h.exe_path = '/bin/bash'
+      h.args = [ '-c', 'echo foo' ]
+    end
+
+    d.start_check
+    assert_equal( :up, d.state )
+    # Says alive, but dead until the next check.
+    assert_equal( false, d.alive? )
+  ensure
+    pid_file = File.join( @tdir, 'echo.pid' )
     File.delete( pid_file ) if File.exist?( pid_file )
   end
 
