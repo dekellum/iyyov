@@ -78,16 +78,23 @@ module Iyyov
     end
 
     # Java 7 is required for the inheritIO call
-    def attempt_io_redirect( process_builder )
-      return false unless process_builder
+    def attempt_io_redirect( process_builder, jvm_version = current_jvm_version )
+      return false unless process_builder && jvm_version
 
-      jvm_version = System.getProperties[ "java.runtime.version" ]
-      major, minor, _ = jvm_version.split( /\./ )
-      if major.to_i >= 1 && minor.to_i >= 7
+      if jvm_version >= 1.7
         process_builder.inheritIO()
         return true
       end
+
       return false
+    end
+
+    private
+
+    def current_jvm_version
+      jvm_version = System.getProperties[ "java.runtime.version" ]
+      major, minor, _ = jvm_version.split( /\./ )
+      return ( major.to_i + (minor.to_f/10.0) )
     end
 
   end
