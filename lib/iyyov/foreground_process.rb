@@ -18,7 +18,9 @@ module Iyyov
   include RJack
 
   # Support external processes that run in the foreground as daemons (daemonized
-  # with help from Iyyov).
+  # with help from Iyyov). All output from the process will be logged to the Iyyov
+  # log. This is intended for processes that run on the foreground but manage
+  # logging seperately.
   class ForegroundProcess < Daemon
     include Java
     import java.lang.System
