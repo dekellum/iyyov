@@ -23,6 +23,7 @@ require 'fileutils'
 
 class TestDaemon < MiniTest::Unit::TestCase
   include Iyyov
+  import java.lang.System
 
   def setup
     @log = RJack::SLF4J[ self.class ]
@@ -140,23 +141,34 @@ class TestDaemon < MiniTest::Unit::TestCase
     File.delete( d.default_log ) if File.exist?( d.default_log )
   end
 
-  def test_foreground_process_log
-    d = ForegroundProcess.new( @context ) do |h|
-      h.name = 'echo'
-      h.run_dir = @tdir
-      h.exe_path = '/bin/bash'
-      h.args = [ '-c', 'echo foo' ]
+  def test_foreground_process_inherit_io
+    jvm_version = System.getProperties["java.runtime.version"]
+    major, minor, other = jvm_version.split(/\./)
+    if major.to_i >= 1 && minor.to_i >= 7
+      # Java 7, test IO redirect
+      @daemon = ForegroundProcess.new( @context ) do |h|
+        h.name = 'echo'
+        h.run_dir = @tdir
+        h.exe_path = '/bin/bash'
+        h.args = [ '-c', 'echo foo' ]
+      end
+
+      $called = false
+      def @daemon.attempt_io_redirect( builder )
+        $called = true
+      end
+
+      @daemon.start
+      assert( $called, "Should have called attempt_io_redirect on start" )
+      @daemon.stop
+    else
+      skip("Java 7 required to test forground process redirect")
     end
 
-    d.start
-    d.stop
-
-    logged = File.read( d.default_log )
-    assert_equal( "foo\n", logged )
   ensure
+    @daemon.stop if @daemon
     pid_file = File.join( @tdir, 'echo.pid' )
     File.delete( pid_file ) if File.exist?( pid_file )
-    File.delete( d.default_log ) if File.exist?( d.default_log )
   end
 
 end

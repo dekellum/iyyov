@@ -13,7 +13,6 @@ RJack::TarPit.specify do |s|
   s.depend 'rjack-slf4j',           '>= 1.6.5', '< 1.8'
   s.depend 'rjack-logback',         '~> 1.2'
   s.depend 'logrotate',             '=  1.2.1'
-  s.depend 'childprocess',          '~> 0.3.6'
 
   s.depend 'minitest',              '~> 2.2',       :dev
   s.depend 'hashdot-test-daemon',   '~> 1.2',       :dev
