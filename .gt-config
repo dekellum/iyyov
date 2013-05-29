@@ -6,7 +6,11 @@ Gravitext::DevTools.configure do |c|
     h.holder = "David Kellum"
     h.inception = 2010
     h.license = :apache
-    h.exclusions += [ 'config/**/*', 'test/jobs-*.rb' ]
+    h.exclusions += [ 'config/**/*', 'test/jobs-*.rb', '.travis.yml' ]
+  end
+
+  c.setup_manifest do |m|
+    m.exclusions += [ '.travis.yml' ]
   end
 
 end

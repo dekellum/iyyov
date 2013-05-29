@@ -1,0 +1,8 @@
+language: ruby
+before_install: gem install rjack-tarpit -v=2.0.2
+rvm:
+  - jruby-1.6.8
+  - jruby-1.6.8 --1.9
+  - jruby-18mode
+  - jruby-19mode
+script: "bundle exec rake test"

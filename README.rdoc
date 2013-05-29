@@ -3,6 +3,7 @@
 * http://github.com/dekellum/iyyov
 * http://en.wikipedia.org/wiki/Iyyov
 * http://gravitext.com/#vblog
+* {<img src="https://travis-ci.org/dekellum/iyyov.png" />}[https://travis-ci.org/dekellum/iyyov]
 
 == Description
 
