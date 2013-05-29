@@ -14,7 +14,7 @@ RJack::TarPit.specify do |s|
   s.depend 'rjack-logback',         '~> 1.2'
   s.depend 'logrotate',             '=  1.2.1'
 
-  s.depend 'minitest',              '~> 2.2',       :dev
+  s.depend 'minitest',              '~> 4.6.2',     :dev
   s.depend 'hashdot-test-daemon',   '~> 1.2',       :dev
 
   s.platform = :java
