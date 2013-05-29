@@ -178,7 +178,7 @@ module Iyyov
     rescue DaemonFailed, SystemCallError => e
       #FIXME: Ruby 1.4.0 throws SystemCallError when mkdir fails from
       #permissions
-      @log.error( e.to_s )
+      @log.error( "Do first", e )
       @state = :failed
       :stop
     end
@@ -256,7 +256,7 @@ module Iyyov
       @state = :up
       true
     rescue Gem::LoadError, Gem::GemNotFoundException, DaemonFailed, Errno::ENOENT => e
-      @log.error( e.to_s )
+      @log.error( "On exec", e )
       @state = :failed
       false
     end
@@ -330,7 +330,7 @@ module Iyyov
       false
     rescue Errno::EPERM => e
       # Not permitted: only raised by MRI ruby currently
-      @log.error( e )
+      @log.error( "On stop", e )
       false
     end
 
