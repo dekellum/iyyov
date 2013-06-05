@@ -1,4 +1,7 @@
 === 1.2.0 (TBD)
+* Improve deamon log output
+* Add Travis CI test setup (build)
+* Upgrade to minitest ~> 4.7.4 (build)
 
 === 1.1.4 (2012-9-15)
 * Upgrade/broaden to slf4j [1.6.5,1.8), logback ~> 1.2
