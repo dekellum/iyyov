@@ -1,4 +1,4 @@
-=== 1.2.0 (TBD)
+=== 1.2.0 (2013-12-6)
 * Improve deamon log output
 * Add Travis CI test setup (build)
 * Upgrade to minitest ~> 4.7.4 (build)
