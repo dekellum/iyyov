@@ -3,6 +3,10 @@ before_install: "gem install rjack-tarpit -v'~>2.1'"
 bundler_args: ""
 rvm:
   - jruby-18mode
-  - jruby-19mode
+  - jruby
   - jruby-head
 script: "bundle exec rake test"
+matrix:
+  allow_failures:
+    - rvm: jruby-18mode
+    - rvm: jruby-head
