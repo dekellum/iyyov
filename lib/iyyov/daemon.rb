@@ -126,6 +126,7 @@ module Iyyov
       @make_run_dir = @context.make_run_dir
       @stop_on_exit = @context.stop_on_exit
       @stop_delay   = @context.stop_delay
+      @foreground   = false
 
       @pid_file     = method :default_pid_file
       @gem_name     = method :name
@@ -250,7 +251,7 @@ module Iyyov
       end
 
       Dir.chdir( run_dir ) do
-        system( epath, *eargs ) or raise( DaemonFailed, "Start failed with #{$?}" )
+        exec_command( epath, eargs )
       end
 
       @state = :up
@@ -272,6 +273,10 @@ module Iyyov
     rescue Gem::LoadError, Gem::GemNotFoundException, Errno::ENOENT => e
       @log.warn( e.to_s )
       false
+    end
+
+    def exec_command( command, args )
+      system( command, *args ) or raise( DaemonFailed, "Start failed with #{$?}" )
     end
 
     # Return array suitable for comparing this daemon with prior
