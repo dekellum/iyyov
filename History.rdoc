@@ -1,4 +1,9 @@
 === 1.3.0 (TBD)
+* Add Context.load_directory to load the contents of a jobs.d
+  directory. Each contained executable *.rb file is loaded. This
+  allows deploying a file for each independent job and
+  enabling/disabling jobs with chmod +x/-x.  The directory itself and
+  all *.rb files are watched for mtime or ctime change.
 
 === 1.2.0 (2013-12-6)
 * Improve deamon log output

@@ -125,11 +125,32 @@ module Iyyov
       nil
     end
 
+    # Load all executable *.rb files in the specified
+    # directory. Non-executable *.rb files are assumed temporarily
+    # disabled and are still watched for a ctime change. The
+    # directory itself is also watched for an mtime change (as in
+    # adding a new file).
+    def load_directory( dir )
+      @files[ dir ] = [ File.stat( dir ).mtime, nil ]
+
+      Dir.glob( File.join( dir, '*.rb' ) ) do |file|
+        fstat = File.stat( file )
+        if fstat.executable?
+          load_file( file )
+        else
+          # Still watch ctime on this file, so if it changes to executable
+          # we reload.
+          @files[ file ] = [ nil, fstat.ctime ]
+        end
+      end
+    end
+
     def load_file( file, is_root = false )
       @log.info { "Loading #{file}" }
       begin
+        fstat = File.stat( file )
+        @files[ file ] = [ fstat.mtime, fstat.ctime ]
         load file
-        @files[ file ] = File.stat( file ).mtime
         @root_files << file if is_root
         true
       rescue SetupError, ScriptError, StandardError => e
@@ -155,11 +176,16 @@ module Iyyov
       return unless @watch_files && ! @files.empty?
       t = Task.new( :name => "watch-files", :period => 11.0 ) do
         reload = false
-        @files.each do |fname, last_time|
+        @files.each do |fname, (last_mtime, last_ctime)|
           begin
-            new_time = File.stat( fname ).mtime
-            if new_time != last_time
+            fstat = File.stat( fname )
+            if last_mtime && ( last_mtime != fstat.mtime )
               @log.info { "#{fname} has new modification time, reloading." }
+              reload = true
+              break
+            end
+            if last_ctime && ( last_ctime != fstat.ctime )
+              @log.info { "#{fname} has new change time, reloading." }
               reload = true
               break
             end
