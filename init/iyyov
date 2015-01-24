@@ -3,7 +3,7 @@
 #. hashdot.profile         += daemon
 #. hashdot.pid_file         = ./iyyov.pid
 #. hashdot.io_redirect.file = ./iyyov.log
-#. hashdot.vm.options += -Xmx64m
+#. hashdot.vm.options += -Xmx128m
 #. hashdot.vm.options += -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled
 
 #--
