@@ -1,3 +1,5 @@
+=== 1.3.1 (TBD)
+
 === 1.3.0 (2014-2-24)
 * Add Context.load_directory to load the contents of a jobs.d
   directory. Each contained executable *.rb file is loaded. This

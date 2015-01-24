@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    iyyov (1.3.0-java)
+    iyyov (1.3.1-java)
       logrotate (= 1.2.1)
       rjack-logback (~> 1.2)
       rjack-slf4j (>= 1.6.5, < 1.8)
