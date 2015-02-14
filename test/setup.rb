@@ -20,7 +20,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'rjack-logback'
-RJack::Logback.config_console( :level => RJack::Logback::INFO, :stderr => true )
+RJack::Logback.config_console( :level => RJack::Logback::INFO, :thread => true, :stderr => true )
 
 require 'minitest/unit'
 require 'minitest/autorun'

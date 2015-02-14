@@ -118,6 +118,7 @@ module Iyyov
 
     def run_thread
       Thread.new do
+        java.lang.Thread::currentThread.name = "task-#{name.to_s}"
         if @lock.try_lock
           begin
             @async_rc = run_direct
