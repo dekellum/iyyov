@@ -15,7 +15,7 @@ GEM
     json (1.8.6-java)
     logrotate (1.2.1)
     minitest (4.7.5)
-    rake (12.1.0)
+    rake (12.3.2)
     rdoc (4.0.1)
       json (~> 1.4)
     rjack-logback (1.9.0-java)
@@ -38,4 +38,4 @@ DEPENDENCIES
   rjack-tarpit (~> 2.1)
 
 BUNDLED WITH
-   1.15.1
+   1.17.3
